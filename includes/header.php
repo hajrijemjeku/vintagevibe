@@ -1,3 +1,21 @@
+<?php
+session_start();
+include 'db.php';
+    
+    spl_autoload_register(function ($class_name) {
+        include $class_name . '.php';
+    });
+
+
+
+
+
+
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,30 +31,34 @@
         }
     </style>
 </head>
-<body>
+<body style="overflow-x:hidden;">
     <header>
         
         <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg fixed-top bg-light navbar-light">
-        <div class="container">
-            <div style="background-color: #dcaac0;"  class="container d-flex justify-content-center">
-                <div class="row">
+        <!-- <nav class="navbar navbar-expand-lg fixed-top bg-light navbar-light"> -->
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        
+            <div style="background-color: #dcaac0;"  class="w-100">
+            <div class="container">
+                <div class="row d-flex align-items-center py-3">
                 <div class="col-12 d-flex justify-content-between mb-3 mt-4">
                     <div>
-                        <a style="margin-left:480px;" class="navbar-brand" href="#"
-                        ><img
-                        id="MDB-logo"
-                        src="assets/images/logo.png"
-                        alt="vintagevibe Logo"
-                        draggable="false"
-                        width="350"/></a>
+                        <a style="margin-left:480px;" class="navbar-brand" href="#">
+                            <img id="logo" src="assets/images/logo.png" alt="vintagevibe Logo" draggable="false" width="350"/>
+                        </a>
                     </div>
 
-                    <div class="flex-end mt-2" >
-                        <form action="shop.php" role="search" >
-                            <input name="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <!-- <button name="search" class="btn btn-outline-success" type="submit">Search</button> -->
-                        </form>
+                    <div class="flex-end" >
+                        <!-- Me u shfaq search vetem tek shop.php -->
+                        <?php $current_page = $_SERVER['PHP_SELF'];
+                            $current_page = explode('/', $current_page);
+                            if(end($current_page) == 'index.php'):
+                        ?>
+                            <form action="index.php" method="GET" role="search" class="mt-2" >
+                                <input name="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                                <?php if(isset($_GET['search']) && !empty($_GET['search'])): ?> value = "<?php echo $_GET['search'] ?>" <?php  endif; ?>>
+                            </form>
+                        <?php endif; ?>
                         <ul class="navbar-nav align-items-center mx-auto">
                             <li class="nav-item">
                                 <a class="nav-link mx-2 text-white" href="#!">SignUp</a>
@@ -85,7 +107,3 @@
         <!-- Navbar -->
         
     </header>
-
-
-</body>
-</html>
