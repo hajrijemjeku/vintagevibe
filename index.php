@@ -24,8 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $wishlistItems = $_SESSION['wishlist'];
 
 
-
-
 ?>
 <style>
     .card {
@@ -48,13 +46,143 @@ $wishlistItems = $_SESSION['wishlist'];
 </style>
 <section class="index py-5">
     <div class="container" style="background-color:lightblue">
-        <h2 class="text-center">Latest Products</h2>
+        <h2 class="text-center">All Products</h2>
+        <div class="row mt-4">
+            <div class="col-12">
+                <form action="<?= $_SERVER['PHP_SELF']?>" method="get" class="d-inline">
+                    <button class="btn btn-outline-primary" title="Nga me e shtrenjta tek me e lira" type="submit" name="down">
+                        <i class="fa fa-arrow-down"></i>
+                    </button><span>Price</span>
+                    <button class="btn btn-outline-primary" title="Nga me e lira tek me e shtrenjta" type="submit" name="up">
+                        <i class="fa fa-arrow-up"></i>
+                    </button>
+                </form>
+                <?php
+                    if(isset($_GET['down'])){
+                        $products = $crudObj->select('product',[],[],'','price DESC');
+                        //$products = $products->fetchAll();
+                    }else if(isset($_GET['up'])){
+                        $products = $crudObj->select('product',[],[],'','price ASC');
+                        //$products = $products->fetchAll();
+                    }else {
+                        $crudObj = new Crud($pdo);
+                        $products = $crudObj->select('product',['id','name','price', 'size'],[] ,'', 'id DESC');
+                    }
+                ?>
+                
+                <button type="submit" class="btn btn-outline-success filter-btn" data-bs-toggle="modal" data-bs-target="#filterModal">Filter</button>
+        <!-- MODAL FOR FILTERING DATA-->
+        <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filterModalLabel">Filter</h5>
+                            <button type="submit" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="reviewForm" action="<?= $_SERVER['PHP_SELF'] ?>" method="GET">
+                            <div class="modal-body">
+                                <!-- <div class="form-group">
+                                    <label for="rooms">Rooms:</label>
+                                    <input type="number" class="form-control" id="rooms" name="rooms" min="1">
+                                </div> -->
+                                <div class="form-group">
+                                    <label for="size" class="form-label">Size</label>
+                                    <select name="size" id="size" class="form-control mb-2">
+                                        <option value="">Select Size</option>
+                                        <?php
+                                            $sizes = (new CRUD($pdo))->distinctSelect('product','size');
+                                            $sizes = $sizes->fetchAll();
+                                            
+                                            foreach($sizes as $size):
+                                        ?>
+                                        <option value="<?= $size['size']; ?>"><?= $size['size']; ?></option>
+                                            <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select name="category" id="category" class="form-control mb-2">
+                                        <option value="">Select Category</option>
+                                        <?php
+                                            $categories = (new CRUD($pdo))->select('category',[],[],'','');
+                                            $categories = $categories->fetchAll();
+                                            
+                                            foreach($categories as $category):
+                                        ?>
+                                        <option value="<?= $category['id']; ?>"><?= $category['name']; ?></option>
+                                            <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="era" class="form-label">Era</label>
+                                    <select name="era" id="era" class="form-control mb-2">
+                                        <option value="">Select Era</option>
+                                        <?php
+                                            $era = (new CRUD($pdo))->select('era',[],[],'','');
+                                            $era = $era->fetchAll();
+                                            
+                                            foreach($era as $years):
+                                        ?>
+                                        <option value="<?= $years['id']; ?>"><?= $years['name']; ?></option>
+                                            <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button name="filterdata" type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+        </div>
+            </div>
+        
+        <?php
+            if(isset($_GET['filterdata'])){
+                $size = $_GET['size'];
+                $category = $_GET['category'];
+                $era = $_GET['era'];
+
+                $filterConditions = [];
+                if (!empty($size)) {
+                    $filterConditions['size'] = $size;
+                }
+                if (!empty($category)) {
+                    $filterConditions['categoryid'] = $category;
+                }
+                if (!empty($era)) {
+                    $filterConditions['eraid'] = $era;
+                }
+
+                $products = $crudObj->select('product', [], $filterConditions, '', '');
+                //$products = $products->fetchAll();
+               
+            }
+        ?>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <hr class="mx-auto mt-5 border-secondary">
+            </div>
+           
+        </div>
+
         <div class="row mt-4">
                 <!-- Latest products prej db me while -->
                  <?php
-                    $crudObj = new Crud($pdo);
-                    $products = $crudObj->select('product',['id','name','price', 'size'],[] ,'', 'DESC');
+                 //else {
+                    //$crudObj = new Crud($pdo);
+                    //$products = $crudObj->select('product',['id','name','price', 'size'],[] ,'', 'id DESC');
+                 //}
                     //   print_r($products->fetch());
+                    // if(isset($_GET['filter']) && !(empty($_GET['pricevalue']))){
+                    //     $price = intval($_GET['pricevalue']);
+                    //     $products = $crudObj->maxvalue('product',[],['price' => $price]);
+                    // }
 
                     if(isset($_GET['search']) && (!empty($_GET['search']))){
 
@@ -62,6 +190,7 @@ $wishlistItems = $_SESSION['wishlist'];
                         //$products = $products->fetchAll();
                         
                     }
+
 
                       
                     while($product = $products->fetch()):
