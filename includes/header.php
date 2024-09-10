@@ -1,6 +1,10 @@
 <?php
 session_start();
 include 'db.php';
+//ob_start();
+//error_reporting(E_ALL);
+// $crudObj = new Crud($pdo);
+
     
     spl_autoload_register(function ($class_name) {
         include $class_name . '.php';
@@ -8,12 +12,14 @@ include 'db.php';
 
 
 
+    
 
 
 
 
 ?>
 
+ <!-- Your HTML to display products -->
 
 
 <!DOCTYPE html>
@@ -67,7 +73,7 @@ include 'db.php';
                                 <a class="nav-link mx-2 text-white" href="#!">SignIn</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link mx-2 text-white" href="#!">Wishlist</a>
+                                <a class="nav-link mx-2 text-white" href="wishlist.php">Wishlist</a>
                             </li>
                         </ul>
 
@@ -79,22 +85,42 @@ include 'db.php';
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav align-items-center mx-auto " >
                         <li class="nav-item">
-                            <a class="nav-link mx-2 text-white" href="#!"><i class="fas fa-home pe-2" style="color:white "></i>Home</a>
+                            <a class="nav-link mx-2 text-white" href="index.php"><i class="fas fa-home pe-2" style="color:white "></i>Home</a>
                         </li>
-                        <li class="nav-item dropdown" style="margin-left:40px">
+                        <!-- <li class="nav-item" style="margin-left:20px">
+                            <a class="nav-link mx-2 text-white" href="products.php"><i class="fa-solid fa-shirt pe-2" style="color:white"></i></i>Products</a>
+                        </li> -->
+                        <li class="nav-item dropdown" style="margin-left:20px">
                             <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-bars-staggered pe-2"></i>
                             Category</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="login.php">Login</a></li>
-                                <li><a class="dropdown-item" href="register.php">Register</a></li>
+                                <?php 
+                                    $crudObj = new Crud($pdo);
+                                    $categories = $crudObj->select('category',['id','name'],[],'','');
+                                    $categories = $categories->fetchAll();
+                                    foreach($categories as $category):
+                                
+                                ?>
+                                <li><a class="dropdown-item" href="products.php?category_id=<?php echo $category['id'];?>"><?= ucfirst($category['name']) ?></a></li>
+
+                                <?php endforeach; ?>
                             </ul>
                         </li>
-                        <li class="nav-item dropdown" style="margin-left:40px">
+                        <li class="nav-item dropdown" style="margin-left:20px">
                             <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-regular fa-calendar pe-2"></i>
                             Era</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="login.php">Login</a></li>
-                                <li><a class="dropdown-item" href="register.php">Register</a></li>
+                            <?php 
+                                $crudObj = new Crud($pdo);
+                                $timeline = $crudObj->select('era',['id','name'],[],'','');
+                                $timeline = $timeline->fetchAll();
+                                foreach($timeline as $era):
+                                
+                            ?>
+                                <li><a class="dropdown-item" href="products.php?era_id=<?php echo $era['id'];?>"><?= ucfirst($era['name']) ?></a></li>
+                                <!-- <?//php if(basename($_SERVER['SCRIPT_FILENAME']) == "index.php"): ?>products.php?era_id=<?//php echo $era['id']; else: ?> <?//php endif; ?>" -->
+                                    <!-- ><?//= ucfirst($era['name']) ?></a></li> -->
+                                <?php endforeach; ?>
                             </ul>
                         </li>
                     </ul>
