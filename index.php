@@ -5,7 +5,6 @@
 if (!isset($_SESSION['wishlist'])) {
     $_SESSION['wishlist'] = [];
 }
-
 // Handle adding/removing items from the wishlist
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && isset($_POST['product_id'])) {
@@ -20,8 +19,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 $wishlistItems = $_SESSION['wishlist'];
+?>
+
+<?php
+if(isset($_POST['add-to-cart'])){
+    $product_id = $_POST['product_id'];
+    $product_name = $_POST['name'];
+    $product_size = $_POST['size'];
+    $product_price = $_POST['price'];
+
+    if(isset($_SESSION['cart'])){
+        if(array_key_exists($product_id, $_SESSION['cart'])){ ?>
+            <script>alert('already added to cart')</script>
+            
+        <?php
+        }else{
+            $_SESSION['cart'][$product_id] = [
+                'id' => $product_id,
+                'name' => $product_name,
+                'size' => $product_size,
+                'price' => $product_price
+            ];
+        }
+    }else{
+        $_SESSION['cart'] = [];
+        $_SESSION['cart'][$product_id] = [
+            'id' => $product_id,
+            'name' => $product_name,
+            'size' => $product_size,
+            'price' => $product_price
+        ];
+
+    }
+    header('Location:index.php');
+
+}
+
+
+
 
 
 ?>
@@ -38,6 +74,12 @@ $wishlistItems = $_SESSION['wishlist'];
             /* height: auto; */
         }
         .btn-wishlist {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .btn-cart {
             background: none;
             border: none;
             cursor: pointer;
@@ -179,18 +221,12 @@ $wishlistItems = $_SESSION['wishlist'];
 
                     if(isset($_GET['search']) && (!empty($_GET['search']))){
 
-                        $products = $crudObj->search('product',['id','name','price','size'],['name'=> $_GET['search']],'');
-                        //$products = $products->fetchAll();
-                        
+                        $products = $crudObj->search('product',['id','name','price','size'],['name'=> $_GET['search']],'');      
                     }
-
-
-                      
                     while($product = $products->fetch()):
 
                         $images = $crudObj->select('image',['src','alt'],['productid'=>$product['id']] ,'', '');
-                        $image = $images->fetchAll();
-                          
+                        $image = $images->fetchAll();    
                  ?>
 
                 <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
@@ -204,18 +240,26 @@ $wishlistItems = $_SESSION['wishlist'];
                                     Price: <strong> <?php echo number_format($product['price'],2);  ?> &euro; </strong> / Size: <strong><?= $product['size'] ?> </strong>
                                 </p>
 
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                    <?php if (in_array($product['id'], $wishlistItems)): ?>
+                                            <input type="hidden" name="action" value="remove">
+                                            <button class="btn-wishlist"><i class="fa-solid fa-heart"></i></button>
+                                    
+                                    <?php else: ?>
+                                            <input type="hidden" name="action" value="add">
+                                            <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
+                                
+                                    <?php endif; ?>
+                                </form>
+                                <?php if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'] === true)): ?>
+                                    <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST" class="d-inline" style="margin-left:140px;">
+                                        <input type="hidden" name="product_id" id="product_id" value="<?= $product['id'] ?>">
+                                        <input type="hidden" name="name" value="<?= $product['name'] ?>">
+                                        <input type="hidden" name="size"  value="<?= $product['size'] ?>">
+                                        <input type="hidden" name="price"  value="<?= $product['price'] ?>">
 
-                                <?php if (in_array($product['id'], $wishlistItems)): ?>
-                                    <form method="post" style="display:inline;">
-                                        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                                        <input type="hidden" name="action" value="remove">
-                                        <button class="btn-wishlist"><i class="fa-solid fa-heart"></i></button>
-                                    </form>
-                                <?php else: ?>
-                                    <form method="post" style="display:inline;">
-                                        <input type="hidden" name="product_id" value="<?=$product['id'] ?>">
-                                        <input type="hidden" name="action" value="add">
-                                        <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
+                                        <button name="add-to-cart" id="add-to-cart" class="btn-cart" type="submit"><i class="fa-solid fa-cart-shopping"></i></i></button>
                                     </form>
                                 <?php endif; ?>
                             </div>
