@@ -6,6 +6,10 @@ ob_start();
 //error_reporting(E_ALL);
 // $crudObj = new Crud($pdo);
 
+
+// if (!isset($_SESSION['cart'])) {
+//     $_SESSION['cart'] = [];
+// }
     
     spl_autoload_register(function ($class_name) {
         include $class_name . '.php';
@@ -102,7 +106,7 @@ ob_start();
                                     <a class="nav-link mx-2 text-white" href="account.php">Account</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link mx-2 text-white" href="?action=logout">Logout</a>
+                                    <a class="nav-link mx-2 text-white" href="?action=logout">SignOut</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link mx-2 text-white" href="wishlist.php">Wishlist</a>
@@ -169,6 +173,11 @@ ob_start();
                                 <?php endforeach; ?>
                             </ul>
                         </li>
+                        <?php if(isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
+                            <li class="nav-item">
+                                <a class="nav-link mx-2 text-white" href="cart.php"><i class="fas fa-home pe-2" style="color:white "></i>Cart(<?= count($_SESSION['cart']); ?>)</a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                     </div>
                 </div>
