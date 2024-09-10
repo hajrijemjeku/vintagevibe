@@ -1,6 +1,7 @@
-<?php
-session_start();
+<?php session_start();
 include 'db.php';
+ob_start();
+
 //ob_start();
 //error_reporting(E_ALL);
 // $crudObj = new Crud($pdo);
@@ -10,10 +11,20 @@ include 'db.php';
         include $class_name . '.php';
     });
 
+    if(isset($_GET['action']) && $_GET['action'] == 'logout'){
+        session_unset();
+        session_destroy();
+        unset($_SESSION['user_id']);
+        unset($_SESSION['logged_in']);
+        unset($_SESSION['email']);
+        unset( $_SESSION['wishlist']);
+        if(isset($_SESSION['is_admin'])){unset($_SESSION['is_admin']);};
+        if(isset($_SESSION['is_manager'])){unset($_SESSION['is_manager']);};
+        if(isset($_SESSION['is_user'])){unset($_SESSION['is_user']);};
 
+        header('Location:index.php');
 
-    
-
+    }
 
 
 
@@ -65,17 +76,52 @@ include 'db.php';
                                 <?php if(isset($_GET['search']) && !empty($_GET['search'])): ?> value = "<?php echo $_GET['search'] ?>" <?php  endif; ?>>
                             </form>
                         <?php endif; ?>
+                        <?php if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'] === true)): ?>
+                            <?php
+                            // echo '<pre>';
+                            // print_r($_SESSION); // Debugging output
+                            // echo '</pre>'; 
+                            ?>
+                            <ul class="navbar-nav align-items-center mx-auto">
+                                <?php if(isset($_SESSION['is_admin']) && ($_SESSION['is_admin'] === true)): ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link mx-2 text-white" href="dashboard.php">Dashboard</a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if(isset($_SESSION['is_manager']) && ($_SESSION['is_manager'] === true)): ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link mx-2 text-white" href="manage.php">Manage</a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if(isset($_SESSION['is_user']) && ($_SESSION['is_user'] === true)): ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link mx-2 text-white" href="my-orders.php">Orders</a>
+                                    </li>
+                                <?php endif; ?>
+                                <li class="nav-item">
+                                    <a class="nav-link mx-2 text-white" href="account.php">Account</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link mx-2 text-white" href="?action=logout">Logout</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link mx-2 text-white" href="wishlist.php">Wishlist</a>
+                                </li>
+                            </ul>
+
+                        <?php else: ?>
                         <ul class="navbar-nav align-items-center mx-auto">
                             <li class="nav-item">
-                                <a class="nav-link mx-2 text-white" href="#!">SignUp</a>
+                                <a class="nav-link mx-2 text-white" href="signup.php">SignUp</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link mx-2 text-white" href="#!">SignIn</a>
+                                <a class="nav-link mx-2 text-white" href="signin.php">SignIn</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link mx-2 text-white" href="wishlist.php">Wishlist</a>
                             </li>
                         </ul>
+                        <?php endif; ?>
 
                     </div>
                     
