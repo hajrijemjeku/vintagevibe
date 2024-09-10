@@ -89,7 +89,7 @@
 
             
             if(!$products && isset($_GET['era_id'])){ ?>
-                <h5 class="card-title">Produkte te eres: se kerkuar <?php echo $era['name'] ?> nuk kemi!</h5>
+                <h5 class="card-title">Produkte te eres se kerkuar nuk kemi!</h5>  <?//php echo $era['name'] ?>
             <?php
             } else if(!$products && isset($_GET['category_id'])){ ?>
                 <h5 class="card-title">Produkte te kategorise se kerkuar me te dhena te filtruara, nuk kemi!</h5>
