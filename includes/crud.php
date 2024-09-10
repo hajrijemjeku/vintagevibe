@@ -96,31 +96,66 @@ class Crud {
          return $this->pdo->query($sql);
     }
 
+    public function insert($table, $columns=[],$values=[]){
 
+        $kolonat = implode(",", $columns);
+        $vlerat = str_repeat("?, ", count($columns));
+        $vlerat = rtrim($vlerat,", ");
 
-    private function wherevalue($where = []){
-        $where_statement = "";
-        if(count($where) > 0) {
-            $where_statement .= " WHERE ";
-            $counter = 0;
+        $sql = "INSERT INTO $table ($kolonat) VALUES ($vlerat);";
+        
+        $query = $this->pdo->prepare($sql);
 
-            foreach($where as $column => $value){
-                if($counter < count($where) - 1){
-                    $where_statement .= " $column <= '$value' AND";}
-                else{
-                    $where_statement .= " $column <= '$value' ";}
-                $counter++;
-            }
-        }
-        return $where_statement;
-    }
-    public function maxvalue($table, $columns = [], $where = []){
-        $columns = $this->columns($columns);
-        $whereClause = $this->wherevalue($where);
-        $sql = "SELECT $columns FROM $table $whereClause";
-        return $this->pdo->query($sql);
+        return $query->execute($values);
 
     }
+
+    public function update($table, $columns = [], $values = [], $where = []){
+        $where = $this->where($where);
+        $kolonat = implode("= ? , ", $columns).  " = ?  " ;
+        $sql = "UPDATE $table SET $kolonat $where ";
+        // echo $sql;
+        // die();
+        $query = $this->pdo->prepare($sql);
+        return $query->execute($values);
+        //update from residence set price='test', rooms = '' where id=4;
+    }
+
+    public function delete($table, $column, $value){
+        $where_statement = " WHERE $column = ? ";
+        $sql = " DELETE FROM $table $where_statement ";
+        // print_r($sql);
+        // die();
+        $query = $this->pdo->prepare($sql);
+        return $query->execute([$value]); 
+
+    }
+
+
+
+    // private function wherevalue($where = []){
+    //     $where_statement = "";
+    //     if(count($where) > 0) {
+    //         $where_statement .= " WHERE ";
+    //         $counter = 0;
+
+    //         foreach($where as $column => $value){
+    //             if($counter < count($where) - 1){
+    //                 $where_statement .= " $column <= '$value' AND";}
+    //             else{
+    //                 $where_statement .= " $column <= '$value' ";}
+    //             $counter++;
+    //         }
+    //     }
+    //     return $where_statement;
+    // }
+    // public function maxvalue($table, $columns = [], $where = []){
+    //     $columns = $this->columns($columns);
+    //     $whereClause = $this->wherevalue($where);
+    //     $sql = "SELECT $columns FROM $table $whereClause";
+    //     return $this->pdo->query($sql);
+
+    // }
 
     public function distinctSelect($table, $column){
         $sql = "SELECT DISTINCT ($column) FROM $table "; 
