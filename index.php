@@ -49,28 +49,30 @@ $wishlistItems = $_SESSION['wishlist'];
         <h2 class="text-center">All Products</h2>
         <div class="row mt-4">
             <div class="col-12">
-                <form action="<?= $_SERVER['PHP_SELF']?>" method="get" class="d-inline">
-                    <button class="btn btn-outline-primary" title="Nga me e shtrenjta tek me e lira" type="submit" name="down">
-                        <i class="fa fa-arrow-down"></i>
-                    </button><span>Price</span>
-                    <button class="btn btn-outline-primary" title="Nga me e lira tek me e shtrenjta" type="submit" name="up">
-                        <i class="fa fa-arrow-up"></i>
-                    </button>
-                </form>
-                <?php
-                    if(isset($_GET['down'])){
-                        $products = $crudObj->select('product',[],[],'','price DESC');
-                        //$products = $products->fetchAll();
-                    }else if(isset($_GET['up'])){
-                        $products = $crudObj->select('product',[],[],'','price ASC');
-                        //$products = $products->fetchAll();
-                    }else {
-                        $crudObj = new Crud($pdo);
-                        $products = $crudObj->select('product',['id','name','price', 'size'],[] ,'', 'id DESC');
-                    }
-                ?>
-                
-                <button type="submit" class="btn btn-outline-success filter-btn" data-bs-toggle="modal" data-bs-target="#filterModal">Filter</button>
+                <div class="text-center">
+                    <form action="<?= $_SERVER['PHP_SELF']?>" method="get" class="d-inline">
+                        <button class="btn btn-outline-primary" title="Nga me e shtrenjta tek me e lira" type="submit" name="down">
+                            <i class="fa fa-arrow-down"></i>
+                        </button><span class="text-primary"> Price </span>
+                        <button class="btn btn-outline-primary" title="Nga me e lira tek me e shtrenjta" type="submit" name="up">
+                            <i class="fa fa-arrow-up"></i>
+                        </button>
+                    </form>
+                    <?php
+                        if(isset($_GET['down'])){
+                            $products = $crudObj->select('product',[],[],'','price DESC');
+                            //$products = $products->fetchAll();
+                        }else if(isset($_GET['up'])){
+                            $products = $crudObj->select('product',[],[],'','price ASC');
+                            //$products = $products->fetchAll();
+                        }else {
+                            $crudObj = new Crud($pdo);
+                            $products = $crudObj->select('product',['id','name','price', 'size'],[] ,'', 'id DESC');
+                        }
+                    ?>
+                    
+                    <button type="submit" class="btn btn-outline-primary filter-btn" data-bs-toggle="modal" data-bs-target="#filterModal">Filter</button>
+                </div>
         <!-- MODAL FOR FILTERING DATA-->
         <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -164,7 +166,7 @@ $wishlistItems = $_SESSION['wishlist'];
         ?>
         </div>
 
-        <div class="row mt-4">
+        <div class="row">
             <div class="col-12">
                 <hr class="mx-auto mt-5 border-secondary">
             </div>
@@ -174,15 +176,6 @@ $wishlistItems = $_SESSION['wishlist'];
         <div class="row mt-4">
                 <!-- Latest products prej db me while -->
                  <?php
-                 //else {
-                    //$crudObj = new Crud($pdo);
-                    //$products = $crudObj->select('product',['id','name','price', 'size'],[] ,'', 'id DESC');
-                 //}
-                    //   print_r($products->fetch());
-                    // if(isset($_GET['filter']) && !(empty($_GET['pricevalue']))){
-                    //     $price = intval($_GET['pricevalue']);
-                    //     $products = $crudObj->maxvalue('product',[],['price' => $price]);
-                    // }
 
                     if(isset($_GET['search']) && (!empty($_GET['search']))){
 
@@ -200,37 +193,34 @@ $wishlistItems = $_SESSION['wishlist'];
                           
                  ?>
 
-                        <!-- <a href="product_details.php?product_id=<?=$product['id'];?>">
-                            <img src="./assets/images/products/<?= $image[0]['src']; ?>" class="card-img-top" alt="<?= $image[0]['alt']; ?>" height="300px">
-                        </a> -->
                 <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
-                <a href="product_details.php?product_id=<?=$product['id'];?>" class="text-decoration-none">
-                    <div class="card" style="width: 18rem;">
-                        <input type="hidden" name="product_id" id="product_id" value="<?= $product['id'] ?>">
-                        <img src="./assets/images/products/<?= $image[0]['src']; ?>" class="card-img-top" alt="<?= $image[0]['alt']; ?>" height="300px">
-                        <div class="card-body">
-                            <h5 class="card-title"><?php echo $product['name'] ?></h5>
-                            <p class="card-text"> 
-                                Price: <strong> <?php echo number_format($product['price'],2);  ?> &euro; </strong> / Size: <strong><?= $product['size'] ?> </strong>
-                            </p>
+                    <a href="product_details.php?product_id=<?=$product['id'];?>" class="text-decoration-none">
+                        <div class="card" style="width: 18rem;">
+                            <input type="hidden" name="product_id" id="product_id" value="<?= $product['id'] ?>">
+                            <img src="./assets/images/products/<?= $image[0]['src']; ?>" class="card-img-top" alt="<?= $image[0]['alt']; ?>" height="300px">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo $product['name'] ?></h5>
+                                <p class="card-text"> 
+                                    Price: <strong> <?php echo number_format($product['price'],2);  ?> &euro; </strong> / Size: <strong><?= $product['size'] ?> </strong>
+                                </p>
 
 
-                            <?php if (in_array($product['id'], $wishlistItems)): ?>
-                                <form method="post" style="display:inline;">
-                                    <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                                    <input type="hidden" name="action" value="remove">
-                                    <button class="btn-wishlist"><i class="fa-solid fa-heart"></i></button>
-                                </form>
-                            <?php else: ?>
-                                <form method="post" style="display:inline;">
-                                    <input type="hidden" name="product_id" value="<?=$product['id'] ?>">
-                                    <input type="hidden" name="action" value="add">
-                                    <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
-                                </form>
-                            <?php endif; ?>
+                                <?php if (in_array($product['id'], $wishlistItems)): ?>
+                                    <form method="post" style="display:inline;">
+                                        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                        <input type="hidden" name="action" value="remove">
+                                        <button class="btn-wishlist"><i class="fa-solid fa-heart"></i></button>
+                                    </form>
+                                <?php else: ?>
+                                    <form method="post" style="display:inline;">
+                                        <input type="hidden" name="product_id" value="<?=$product['id'] ?>">
+                                        <input type="hidden" name="action" value="add">
+                                        <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
                 </div>
 
                 <?php endwhile; ?>
