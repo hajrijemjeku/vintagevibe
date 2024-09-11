@@ -9,7 +9,7 @@
             <?php
                 if(isset($_GET['product_id']) && !(empty($_GET['product_id']))){
                     $crudObj = new Crud($pdo);
-                    $productdetails = $crudObj->select('product',['id','name','price','size'],['id'=>$_GET['product_id']],'','');
+                    $productdetails = $crudObj->select('product',['id','name','price','size','qty'],['id'=>$_GET['product_id']],'','');
                     $productdetails = $productdetails->fetch();
 
                     $images = $crudObj->select('image',['id','src','alt','productid'],['productid'=> $_GET['product_id']],'','');
@@ -18,6 +18,7 @@
                     $defaultImageId = $images[0]['id'] ?? null;
 
                 }
+                if($productdetails['qty']==1){
             ?>
             <?php if(!empty($images)):
                    foreach ($images as $image): ?>
@@ -71,7 +72,7 @@
                     foreach($similarproducts as $similarproduct):
                         $images = $crudObj->select('image',['id','src','alt','productid'],['productid'=> $similarproduct['id']],'','');
                         $images = $images->fetchAll();
-                        if(!($similarproduct['id']== $productdetails['id'])):
+                        if(!($similarproduct['id']== $productdetails['id'])){
                 ?>
                 <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
                     <a href="product_details.php?product_id=<?=$similarproduct['id'];?>" class="text-decoration-none">
@@ -91,12 +92,13 @@
 
 
                 <?php
-                    else: continue; endif; endforeach;
+                        }else{ continue;} endforeach;
                 ?>
 
             </div>
 
         </div>
+        <?php } else{ header('Location:index.php');} ?>
     </div>
     <!-- <script>
         document.querySelectorAll('.small-image').forEach(function(img) {
