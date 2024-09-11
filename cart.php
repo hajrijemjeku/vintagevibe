@@ -70,7 +70,11 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
     
     foreach($_SESSION['cart'] as $product){
 
-        $crudObj->insert('order_product',['orderid','productid','qty'],[$lastOrderId,$product['id'],$product['qty']]);
+        $checkoutdone = $crudObj->insert('order_product',['orderid','productid','qty'],[$lastOrderId,$product['id'],$product['qty']]);
+
+        if($checkoutdone){
+            $outofstock = $crudObj->update('product',['qty'],[0],['id'=>$product['id']]);
+        }
     }
     unset($_SESSION['cart']);
 
