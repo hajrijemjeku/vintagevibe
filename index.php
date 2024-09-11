@@ -28,6 +28,8 @@ if(isset($_POST['add-to-cart'])){
     $product_name = $_POST['name'];
     $product_size = $_POST['size'];
     $product_price = $_POST['price'];
+    $product_qty = $_POST['qty'];
+
 
     if(isset($_SESSION['cart'])){
         if(array_key_exists($product_id, $_SESSION['cart'])){ ?>
@@ -39,7 +41,9 @@ if(isset($_POST['add-to-cart'])){
                 'id' => $product_id,
                 'name' => $product_name,
                 'size' => $product_size,
-                'price' => $product_price
+                'price' => $product_price,
+                'qty' => $product_qty
+
             ];
         }
     }else{
@@ -48,7 +52,8 @@ if(isset($_POST['add-to-cart'])){
             'id' => $product_id,
             'name' => $product_name,
             'size' => $product_size,
-            'price' => $product_price
+            'price' => $product_price,
+            'qty' => $product_qty
         ];
 
     }
@@ -85,6 +90,24 @@ if(isset($_POST['add-to-cart'])){
             cursor: pointer;
             font-size: 24px;
         }
+
+
+        .card {
+        position: relative;
+    }
+
+    .out-of-stock-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 10; /* Ensure it appears above other content */
+        opacity: 0.5; /* Adjust opacity if needed */
+    }
 </style>
 <section class="index py-5">
     <div class="container" style="background-color:lightblue">
@@ -109,7 +132,7 @@ if(isset($_POST['add-to-cart'])){
                             //$products = $products->fetchAll();
                         }else {
                             $crudObj = new Crud($pdo);
-                            $products = $crudObj->select('product',['id','name','price', 'size'],[] ,'', 'id DESC');
+                            $products = $crudObj->select('product',['id','name','price', 'size','qty'],[] ,'', 'id DESC');
                         }
                     ?>
                     
@@ -221,12 +244,13 @@ if(isset($_POST['add-to-cart'])){
 
                     if(isset($_GET['search']) && (!empty($_GET['search']))){
 
-                        $products = $crudObj->search('product',['id','name','price','size'],['name'=> $_GET['search']],'');      
+                        $products = $crudObj->search('product',['id','name','price','size','qty'],['name'=> $_GET['search']],'');      
                     }
                     while($product = $products->fetch()):
-
+                        
                         $images = $crudObj->select('image',['src','alt'],['productid'=>$product['id']] ,'', '');
-                        $image = $images->fetchAll();    
+                        $image = $images->fetchAll();   
+                        if($product['qty']==1): 
                  ?>
 
                 <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
@@ -258,6 +282,7 @@ if(isset($_POST['add-to-cart'])){
                                         <input type="hidden" name="name" value="<?= $product['name'] ?>">
                                         <input type="hidden" name="size"  value="<?= $product['size'] ?>">
                                         <input type="hidden" name="price"  value="<?= $product['price'] ?>">
+                                        <input type="hidden" name="qty"  value="<?= $product['qty'] ?>">
 
                                         <button name="add-to-cart" id="add-to-cart" class="btn-cart" type="submit"><i class="fa-solid fa-cart-shopping"></i></i></button>
                                     </form>
@@ -267,7 +292,56 @@ if(isset($_POST['add-to-cart'])){
                     </a>
                 </div>
 
-                <?php endwhile; ?>
+                <?php else: ?>
+                
+                    <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
+                    <!-- <a href="product_details.php?product_id=<?//=$product['id'];?>" class="text-decoration-none"> -->
+                        <div class="card" style="width: 18rem;">
+                        <img src="./assets/images/products/out-of-stock.jpg" class="out-of-stock-overlay" alt="Out of Stock">
+                            <input type="hidden" name="product_id" id="product_id" value="<?= $product['id'] ?>">
+                            <img src="./assets/images/products/<?= $image[0]['src']; ?>" class="card-img-top" alt="<?= $image[0]['alt']; ?>" height="300px">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo $product['name'] ?></h5>
+                                <p class="card-text"> 
+                                    Price: <strong> <?php echo number_format($product['price'],2);  ?> &euro; </strong> / Size: <strong><?= $product['size'] ?> </strong>
+                                </p>
+
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                    <?php if (in_array($product['id'], $wishlistItems)): ?>
+                                            <input type="hidden" name="action" value="remove">
+                                            <button class="btn-wishlist"><i class="fa-solid fa-heart"></i></button>
+                                    
+                                    <?php else: ?>
+                                            <input type="hidden" name="action" value="add">
+                                            <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
+                                
+                                    <?php endif; ?>
+                                </form>
+                                <?php if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'] === true)): ?>
+                                    <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST" class="d-inline" style="margin-left:140px;">
+                                        <input type="hidden" name="product_id" id="product_id" value="<?= $product['id'] ?>">
+                                        <input type="hidden" name="name" value="<?= $product['name'] ?>">
+                                        <input type="hidden" name="size"  value="<?= $product['size'] ?>">
+                                        <input type="hidden" name="price"  value="<?= $product['price'] ?>">
+                                        <input type="hidden" name="qty"  value="<?= $product['qty'] ?>">
+
+                                        <button name="add-to-cart" id="add-to-cart" class="btn-cart" type="submit"><i class="fa-solid fa-cart-shopping"></i></i></button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <!-- </a> -->
+                    </div>
+                
+                
+                
+                
+                
+                
+                
+                
+                <?php endif; endwhile; ?>
             
         </div>
     </div>
