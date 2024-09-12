@@ -3,10 +3,16 @@
 <?php
 $errors[] = '';
 if(!(isset($_SESSION['logged_in'])) && !($_SESSION['logged_in'] == true)){
-    header('Location:signin.php');}
+    header('Location:signin.php');
+}
 
+if(isset($_GET['search-products']) && !empty($_GET['search-products'])){
+    $products = (new CRUD($pdo))->search('product',[],['name'=>$_GET['search-products']],'');
 
-$products = (new CRUD($pdo))->select('product',[],[],'','');
+}else{
+    $products = (new CRUD($pdo))->select('product',[],[],'','');
+
+}
 
 $products = $products->fetchAll();
 
@@ -42,6 +48,11 @@ if(isset($_POST['edit-btn'])){
 ?>
     <section class="manage-products py-5">
         <div class="container">
+        <div class="search mb-3 w-100" style="margin-left:920px;">
+            <form class="w-50"  method="get" action="<?= $_SERVER['PHP_SELF'];?>">
+                <input class="w-50" type="search" name="search-products" value="<?= isset($_GET['search-products']) && !empty($_GET['search-products']) ? $_GET['search-products'] : '' ?>" placeholder="Search based on product name" >
+            </form>
+        </div>
         <?php if(count($products) > 0): ?>
             <h2 class="text-center">My Products (<?= count($products); ?>)</h2>
         
