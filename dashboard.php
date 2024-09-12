@@ -4,7 +4,6 @@ include('includes/header.php');  ?>
 <section class="py-5">
     <div class="container">
         <?php
-        // $_SESSION['logged_in'] = false;
             if((!isset($_SESSION['logged_in'])) || (isset($_SESSION['logged_in']) && ($_SESSION['logged_in'] !== true))){
                 header('Location:signin.php');      
             }
@@ -27,21 +26,17 @@ include('includes/header.php');  ?>
                     </div>
                 </div>
             </div>
-        </div>
-        <?php else: header('Location: index.php'); ?> <?php endif; ?>
-
-        <!-- <?//php if(isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 0): ?>
-            <div class="row">
+            <?php if(isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == true): ?>
                 <div class="col-md-3">
                     <div class="card">
                         <div class="card-body">
-                            <a href="my-orders.php">My Orders</a>
+                            <a class="text-decoration-none fs-5 link-secondary" href="manage-users.php">Manage Users</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        <?//php endif; ?> -->
-
+            <?php endif; ?>
+        </div>
+        <?php else: header('Location: index.php'); ?> <?php endif; ?>
 
 
     </div>
