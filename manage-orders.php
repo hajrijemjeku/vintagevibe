@@ -41,20 +41,7 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
 
 ?>
 
-<?php
-if(isset($_SESSION["is_admin"]) && ($_SESSION["is_admin"] == true)) {
 
-    if(isset($_GET['action']) && $_GET['action'] == 'delete'){
-        //$orderid = $_GET['id'];
-
-        if((new Crud($pdo))->delete('order_product', 'orderid', $_GET['id']) && (new Crud($pdo))->delete('orders', 'id', $_GET['id'])){
-
-            header('Location:manage-orders.php');
-        }
-        
-    }
-}
-?>
 
 
 <section class="products py-5">
@@ -116,10 +103,60 @@ if(isset($_SESSION["is_admin"]) && ($_SESSION["is_admin"] == true)) {
                         <?php } ?>
 
                     </tr>
+
+                    <?php
+                    if(isset($_SESSION["is_admin"]) && ($_SESSION["is_admin"] == true)) {
+
+                        if(isset($_GET['action']) && $_GET['action'] == 'delete'){
+                            $orderId = $_GET['id'];
+                            $order = (new Crud($pdo))->select('orders', [], ['id' => $orderId], '', '')->fetch();
+                            if($order && $order['send_status'] == 'pending'){
+                                //if((new Crud($pdo))->delete('order_product', 'orderid', $_GET['id']) && (new Crud($pdo))->delete('orders', 'id', $_GET['id'])){
+                    
+                                    $orderproduct = (new Crud($pdo))->select('order_product',[],['orderid'=> $orderId],'','orderid');
+                                    $orderproduct = $orderproduct->fetchAll();
+                                    foreach($orderproduct as $op){
+                                        $updatestock = (new Crud($pdo))->update('product',['qty'],[1],['id'=>$op['productid']]);
+
+                                        if(!$updatestock){
+                                            echo "Failed to update stock for productID: " . $op['productid'];
+                                            exit;
+                                        }
+                                    }
+                                    // $deleteOrderProducts = (new Crud($pdo))->delete('order_product', 'orderid', $orderId);
+                                    // $deleteOrder = (new Crud($pdo))->delete('orders', 'id', $orderId);
+
+                                    // if ($deleteOrderProducts && $deleteOrder) {
+                                    //     header('Location: index.php');
+                                    //     exit;
+                                    // } else {
+                                    //     // Handle delete failure
+                                    //     echo 'Failed to delete order or order products.';
+                                    //     exit;
+                                    // }
+                            }
+                            $deleteOrderProducts = (new Crud($pdo))->delete('order_product', 'orderid', $orderId);
+                            $deleteOrder = (new Crud($pdo))->delete('orders', 'id', $orderId);
+
+                            if ($deleteOrderProducts && $deleteOrder) {
+                                header('Location: index.php');
+                                exit;
+                            } else {
+                                // Handle delete failure
+                                echo 'Failed to delete order or order products.';
+                                exit;
+                            }
+                        }
+                    }
+                    ?>
                     <?php endforeach; ?>
             </table>
         </div>
         <?php else : echo "<p>Nuk keni porosi me te dhenat e kerkuara!</p>";  endif; ?>
+
+        <?php
+
+?>
         
     </div>
 </section>
