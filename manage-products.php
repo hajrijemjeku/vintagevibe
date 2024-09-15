@@ -136,99 +136,7 @@ if(isset($_GET['action']) && ($_GET['action']) == 'edit'){
 
 
 
-//chatgpt version1 code
-// if (isset($_POST['update-btn'])) {
-//     $requiredFields = ['edit-name', 'edit-size', 'edit-price', 'edit-qty', 'edit-era', 'edit-category'];
-//     $errors = [];
-
-//     // Check if all required fields are filled
-//     foreach ($requiredFields as $field) {
-//         if (empty($_POST[$field])) {
-//             $errors[] = "Field $field is required.";
-//         }
-//     }
-
-//     if (empty($errors)) {
-//         // Update product details
-//         $crudObj = new CRUD($pdo);
-//         $updateProduct = $crudObj->update(
-//             'product',
-//             ['name', 'size', 'price', 'qty', 'eraid', 'categoryid'],
-//             [$_POST['edit-name'], $_POST['edit-size'], $_POST['edit-price'], $_POST['edit-qty'], $_POST['edit-era'], $_POST['edit-category']],
-//             ['id' => $_POST['productid']]
-//         );
-
-//         if ($updateProduct) {
-//             $images = $_FILES['image'];
-//             $imageNames = $images['name'];
-
-//             if (!empty($imageNames)) {
-//                 foreach ($imageNames as $key => $imageName) {
-//                     $imgTempName = $images['tmp_name'][$key];
-//                     $imgNewName = time() . '-' . $imageName;
-
-//                     if (move_uploaded_file($imgTempName, 'assets/images/products/' . $imgNewName)) {
-//                         // Get all image records for the current product
-//                         $allProdImages = $crudObj->select('image', [], ['productid' => $_POST['productid']],'','');
-//                         $allProdImages = $allProdImages->fetchAll();
-
-//                         // Check if the new image name already exists for the product
-//                         $imageFound = false;
-//                         foreach ($allProdImages as $existingImage) {
-//                             $existingImageSrc = $existingImage['src'];
-//                             // Check if the new image name matches part of the existing image name
-//                             if (strpos($existingImageSrc, '-' . $imageName) !== false) {
-//                                 $imageFound = true;
-//                                 break;
-//                             }
-//                         }
-
-//                         if ($imageFound) {
-//                             // Update existing image record
-//                             $updateImage = $crudObj->update('image', ['src'], [$imgNewName], ['productid' => $_POST['productid'], 'src' => $existingImageSrc]);
-//                             if (!$updateImage) {
-//                                 $errors[] = "Failed to update image $imageName";
-//                             }
-//                         } else {
-//                             // Insert new image record
-//                             $insertImage = $crudObj->insert('image', ['productid', 'src'], [$_POST['productid'], $imgNewName]);
-//                             if (!$insertImage) {
-//                                 $errors[] = "Failed to insert image $imageName";
-//                             }
-//                         }
-//                     } else {
-//                         $errors[] = "Image $imageName could not be uploaded.";
-//                     }
-//                 }
-//             }
-
-//             // Redirect if no errors
-//             if (empty($errors)) {
-//                 header('Location: manage-products.php');
-//                 exit;
-//             }
-//         } else {
-//             $errors[] = 'Product could not be updated.';
-//         }
-//     }
-
-//     // Print errors if any
-//     if (!empty($errors)) {
-//         echo '<pre>';
-//         print_r($errors);
-//         echo '</pre>';
-//     }
-
-//     // Print POST data for debugging
-//     echo '<pre>';
-//     print_r($_POST);
-//     echo '</pre>';
-// }
-
-
-
-//chatgpt version2 code
-if (isset($_POST['update-btn'])) {
+//final code
     
     if(isset($_POST['update-btn'])){
     $requiredFields = ['edit-name', 'edit-size', 'edit-price', 'edit-qty', 'edit-era', 'edit-category'];
@@ -256,7 +164,6 @@ if (isset($_POST['update-btn'])) {
                 $allProdImages = $crudObj->select('image', [], ['productid' => $_POST['productid']],'','');
                 $existingImages = $allProdImages->fetchAll();
 
-                // Initialize counters
                 $imageIndex = 0;
 
                 // Update existing images
@@ -310,8 +217,6 @@ if (isset($_POST['update-btn'])) {
         print_r($errors);
         echo '</pre>';
     }
-
-
 }
 ?>
 
