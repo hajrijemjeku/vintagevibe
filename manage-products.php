@@ -23,51 +23,297 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
     exit;
 }
 
-if(isset($_POST['edit-btn'])){
+?>
 
-    if((!empty($_POST['name'])) && (!empty($_POST['size'])) && (!empty($_POST['price'])) && (!empty($_POST['qty'])) && (!empty($_POST['era'])) && (!empty($_POST['category']))){
+<?php
+if(isset($_GET['action']) && ($_GET['action']) == 'edit'){
+    if(isset($_POST['update-btn'])){
 
-        $updateproduct = (new CRUD($pdo)) -> update('product',['name','size','price','qty','eraid','categoryid'],[$_POST['name'],$_POST['size'],$_POST['price'],$_POST['qty'],$_POST['era'],$_POST['category']],['id'=>$_POST['id']]);
+        $name = $_POST['edit-name'];
+        $price = $_POST['edit-price'];
+        $size = $_POST['edit-size'];
+        $qty = $_POST['edit-qty'];
+        $era = $_POST['edit-era'];
+        $category = $_POST['edit-category'];
+        $edit = (new Crud($pdo)) -> update('product', ['name', 'price','size','qty','eraid', 'categoryid'],[$name, $price, $size, $qty, $era, $category], ['id' => $_POST['productid']]);
+        if ($edit) {
+            // echo "heyyyyyyyyyyyyyyyyyyyyyyyy";
 
-        $images = $_FILES['image'];
-        
-        if($updateproduct){
-            
-            $image_uploaded = $images['name'];
-
-            if(isset($images) && count($image_uploaded)>0){
-                foreach($image_uploaded as $key => $image_name){
-    
-                    $img_tempname = $images['tmp_name'][$key];
-                    $img_newname = time() . '-'. $image_name;
-    
-                    if(move_uploaded_file($img_tempname, 'assets/images/products/'.$img_newname)){
-                        $updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['id']]);
-                        //$insertImage = (new CRUD($pdo))->insert('image', ['productid', 'src'], [$_POST['id'], $img_newname]);
-                        if (!$updateImage) {
-                            $errors[] = "Failed to update image $image_name";
-                        }
-                    } else{
-                        $errors[] = 'Image could not upload';
-                    }
-                }
-                //header('Location:manage-products.php');
-            }
             header('Location:manage-products.php');
-        }else{
-            $errors[] = 'Product could not update';
+        } else {
+            // echo "HIIIIIIIIIIIIIIIIIIIIIII";
+            // echo "<pre>";
+            // print_r($edit);
+            $errors[] = 'Failed to update product';
         }
-        
-        //header('Location:manage-products.php');
-        // exit;
-
-
-    }else {
-        $errors [] = 'something went wrong';
     }
+    
+
 
 }
 
+?>
+<?php
+//my code
+// if(isset($_POST['update-btn'])){
+
+//     if((!empty($_POST['edit-name'])) && (!empty($_POST['edit-size'])) && (!empty($_POST['edit-price'])) && (!empty($_POST['edit-qty'])) && (!empty($_POST['edit-era'])) && (!empty($_POST['edit-category']))){
+
+//         $updateproduct = (new CRUD($pdo)) -> update('product',['name','size','price','qty','eraid','categoryid'],[$_POST['edit-name'],$_POST['edit-size'],$_POST['edit-price'],$_POST['edit-qty'],$_POST['edit-era'],$_POST['edit-category']],['id'=>$_POST['productid']]);
+
+//         $images = $_FILES['image'];
+        
+//         if($updateproduct){
+            
+//             $image_uploaded = $images['name'];
+
+//             if(isset($images) && count($image_uploaded)>0){
+//                 foreach($image_uploaded as $key => $image_name){
+    
+//                     $img_tempname = $images['tmp_name'][$key];
+//                     $img_newname = time() . '-'. $image_name;
+    
+//                     if(move_uploaded_file($img_tempname, 'assets/images/products/'.$img_newname)){
+
+//                         $allprodids = $crudObj->select('image',[],['productid'=> $_POST['productid']],'','');
+//                         $allprodids = $allprodids->fetchAll();
+
+                        
+
+//                         if(count($allprodids)>1){
+//                             $parts = explode('-', $img_newname);
+//                             $lastpart = '-' . end($parts);
+//                             foreach($allprodids as $prodid){
+
+//                                 if(!strpos($prodid['src'],$lastpart)){
+//                                     $updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['productid']]);
+//                                     if($updateImage){
+
+//                                     }
+//                                     break;
+                                    
+
+//                                 } else {
+//                                     continue;
+//                                 }
+//                             }
+
+                           
+//                         }else{
+//                             $updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['productid']]);
+//                         }
+
+
+//                         //$updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['productid']]);
+//                         //$insertImage = (new CRUD($pdo))->insert('image', ['productid', 'src'], [$_POST['id'], $img_newname]);
+//                         if (!$updateImage) {
+//                             $errors[] = "Failed to update image $image_name";
+//                         }
+//                     } else{
+//                         $errors[] = 'Image could not upload';
+//                     }
+//                 }
+//                 //header('Location:manage-products.php');
+//             }
+//             header('Location:manage-products.php');
+//         }else{
+//             $errors[] = 'Product could not update';
+//         }
+        
+//         //header('Location:manage-products.php');
+//         // exit;
+
+
+//     }else {
+//         $errors [] = 'something went wrong';
+//     }
+//     echo '<pre>';
+//     print_r($_POST);
+//     echo '</pre>';
+// }
+
+
+
+
+
+//chatgpt version1 code
+// if (isset($_POST['update-btn'])) {
+//     $requiredFields = ['edit-name', 'edit-size', 'edit-price', 'edit-qty', 'edit-era', 'edit-category'];
+//     $errors = [];
+
+//     // Check if all required fields are filled
+//     foreach ($requiredFields as $field) {
+//         if (empty($_POST[$field])) {
+//             $errors[] = "Field $field is required.";
+//         }
+//     }
+
+//     if (empty($errors)) {
+//         // Update product details
+//         $crudObj = new CRUD($pdo);
+//         $updateProduct = $crudObj->update(
+//             'product',
+//             ['name', 'size', 'price', 'qty', 'eraid', 'categoryid'],
+//             [$_POST['edit-name'], $_POST['edit-size'], $_POST['edit-price'], $_POST['edit-qty'], $_POST['edit-era'], $_POST['edit-category']],
+//             ['id' => $_POST['productid']]
+//         );
+
+//         if ($updateProduct) {
+//             $images = $_FILES['image'];
+//             $imageNames = $images['name'];
+
+//             if (!empty($imageNames)) {
+//                 foreach ($imageNames as $key => $imageName) {
+//                     $imgTempName = $images['tmp_name'][$key];
+//                     $imgNewName = time() . '-' . $imageName;
+
+//                     if (move_uploaded_file($imgTempName, 'assets/images/products/' . $imgNewName)) {
+//                         // Get all image records for the current product
+//                         $allProdImages = $crudObj->select('image', [], ['productid' => $_POST['productid']],'','');
+//                         $allProdImages = $allProdImages->fetchAll();
+
+//                         // Check if the new image name already exists for the product
+//                         $imageFound = false;
+//                         foreach ($allProdImages as $existingImage) {
+//                             $existingImageSrc = $existingImage['src'];
+//                             // Check if the new image name matches part of the existing image name
+//                             if (strpos($existingImageSrc, '-' . $imageName) !== false) {
+//                                 $imageFound = true;
+//                                 break;
+//                             }
+//                         }
+
+//                         if ($imageFound) {
+//                             // Update existing image record
+//                             $updateImage = $crudObj->update('image', ['src'], [$imgNewName], ['productid' => $_POST['productid'], 'src' => $existingImageSrc]);
+//                             if (!$updateImage) {
+//                                 $errors[] = "Failed to update image $imageName";
+//                             }
+//                         } else {
+//                             // Insert new image record
+//                             $insertImage = $crudObj->insert('image', ['productid', 'src'], [$_POST['productid'], $imgNewName]);
+//                             if (!$insertImage) {
+//                                 $errors[] = "Failed to insert image $imageName";
+//                             }
+//                         }
+//                     } else {
+//                         $errors[] = "Image $imageName could not be uploaded.";
+//                     }
+//                 }
+//             }
+
+//             // Redirect if no errors
+//             if (empty($errors)) {
+//                 header('Location: manage-products.php');
+//                 exit;
+//             }
+//         } else {
+//             $errors[] = 'Product could not be updated.';
+//         }
+//     }
+
+//     // Print errors if any
+//     if (!empty($errors)) {
+//         echo '<pre>';
+//         print_r($errors);
+//         echo '</pre>';
+//     }
+
+//     // Print POST data for debugging
+//     echo '<pre>';
+//     print_r($_POST);
+//     echo '</pre>';
+// }
+
+
+
+//chatgpt version2 code
+if (isset($_POST['update-btn'])) {
+    $requiredFields = ['edit-name', 'edit-size', 'edit-price', 'edit-qty', 'edit-era', 'edit-category'];
+  
+    foreach ($requiredFields as $field) {
+        if (empty($_POST[$field])) {
+            $errors[] = "Field $field is required.";
+        }
+    }
+
+    if (empty($errors)) {
+        
+        $crudObj = new CRUD($pdo);
+
+        // Update product details
+        $updateProduct = $crudObj->update('product', ['name', 'size', 'price', 'qty', 'eraid', 'categoryid'], [$_POST['edit-name'], $_POST['edit-size'], $_POST['edit-price'], $_POST['edit-qty'], $_POST['edit-era'], $_POST['edit-category']], ['id' => $_POST['productid']]);
+
+        if ($updateProduct) {
+            $images = $_FILES['image'];  //aray i images qe i kemi upload
+            $imageNames = $images['name']; //merr src te images qe i kemi upload
+            $imageCount = count($imageNames); //numeron images qe i kemi upload
+
+            if ($imageCount > 0) {
+                // Fetch all existing images for the product
+                $allProdImages = $crudObj->select('image', [], ['productid' => $_POST['productid']],'','');
+                $existingImages = $allProdImages->fetchAll();
+
+                // Initialize counters
+                $imageIndex = 0;
+
+                // Update existing images
+                foreach ($existingImages as $existingImage) {
+                    if ($imageIndex < $imageCount) {
+                        $imgTempName = $images['tmp_name'][$imageIndex]; //merr tempname te image te[] qe kemi upload
+                        $imgNewName = time() . '-' . $imageNames[$imageIndex]; // create new name te image te[] qe kemi upload 
+
+                        if (move_uploaded_file($imgTempName, 'assets/images/products/' . $imgNewName)) {
+                            $updateImage = $crudObj->update('image', ['src'], [$imgNewName], ['id' => $existingImage['id']]);
+                            if (!$updateImage) {
+                                $errors[] = "Failed to update image with ID {$existingImage['id']}";
+                            }
+                        } else {
+                            $errors[] = "Image {$imageNames[$imageIndex]} could not be uploaded.";
+                        }
+                        $imageIndex++;
+                    }
+                }
+
+                // Add new images if there are more uploaded images than existing images
+                while ($imageIndex < $imageCount) { //imageIndex value it starts where it left inside foreach.
+                    $imgTempName = $images['tmp_name'][$imageIndex];
+                    $imgNewName = time() . '-' . $imageNames[$imageIndex];
+
+                    if (move_uploaded_file($imgTempName, 'assets/images/products/' . $imgNewName)) {
+                        $insertImage = $crudObj->insert('image', ['productid', 'src'], [$_POST['productid'], $imgNewName]);
+                        if (!$insertImage) {
+                            $errors[] = "Failed to insert image {$imageNames[$imageIndex]}";
+                        }
+                    } else {
+                        $errors[] = "Image {$imageNames[$imageIndex]} could not be uploaded.";
+                    }
+                    $imageIndex++;
+                }
+            }
+
+            // Redirect if no errors
+            if (empty($errors)) {
+                header('Location: manage-products.php');
+                exit;
+            }
+        } else {
+            $errors[] = 'Product could not be updated.';
+        }
+    }
+
+    // Print errors if any
+    if (!empty($errors)) {
+        echo '<pre>';
+        print_r($errors);
+        echo '</pre>';
+    }
+
+    // Print POST data for debugging
+    echo '<pre>';
+    print_r($_POST);
+    echo '</pre>';
+}
 
 ?>
 
@@ -86,11 +332,11 @@ if(isset($_POST['edit-btn'])){
         $era = $_POST['era'];
         $images = $_FILES['image'];
 
-        if(!empty($name) && !empty($price) && !empty($qty) && !empty($size) && !empty($category) && !empty($era)){
-
+        if(!empty($name) && !empty($size) && !empty($category) && !empty($era)){
+            if($price == 0 || $price > 0 || $qty == 0 || $qty > 0){
             $crudObj = new CRUD($pdo);
-
-            if($addProduct = $crudObj->insert('product',['name','price','size','qty','categoryid','eraid'],[$name, $price, $size, $qty, $category, $era])){
+            $addProduct = $crudObj->insert('product',['name','price','size','qty','categoryid','eraid'],[$name, $price, $size, $qty, $category, $era]);
+            if($addProduct){
 
                 $productId = $pdo->lastInsertId();
                 $image_uploaded = $_FILES['image']['name'];
@@ -114,7 +360,7 @@ if(isset($_POST['edit-btn'])){
             else {
                 $errors[] = 'Product was not added!';
             }
-                
+        }
         }
         // if($errors) {
         //     echo '<pre>';
@@ -192,7 +438,7 @@ if(isset($_POST['edit-btn'])){
                                 </div>
                                 <div class="form-group">
                                     <label for="qty">Qty:</label>
-                                    <input type="number" class="form-control" min="0" id="qty" name="qty" required>
+                                    <input type="number" class="form-control" id="qty" name="qty" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="category" class="form-label">Category</label>
@@ -266,18 +512,18 @@ if(isset($_POST['edit-btn'])){
                 
                 <form method="POST" action="<?php $_SERVER['PHP_SELF'] ?>" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <input type="hidden" name="id" class="form-control" id="id" value="<?= $fillinput['id']; ?>" >
+                        <input type="hidden" name="productid" class="form-control" id="productid" value="<?= $fillinput['id']; ?>" >
                     </div>
                     <!-- <div class="mb-3">
                         <input type="hidden" name="personid" class="form-control" id="personid" value="<?//=$fillinput['personid'];?>" >
                     </div> -->
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" name="name" class="form-control" id="title" value="<?=$fillinput['name'];?>" required>
+                        <label for="edit-name" class="form-label">Name</label>
+                        <input type="text" name="edit-name" class="form-control" id="edit-name" value="<?=$fillinput['name'];?>" required>
                     </div>
                     <div class="mb-3">
-                        <label for="size" class="form-label">Size</label>
-                        <select name="size" id="size" class="form-control mb-2">
+                        <label for="edit-size" class="form-label">Size</label>
+                        <select name="edit-size" id="edit-size" class="form-control mb-2">
                             <option value="" disabled>Select Size</option>
                             <?php
                                 $sizeenum = (new CRUD($pdo))->distinctSelect('product','size');
@@ -291,16 +537,16 @@ if(isset($_POST['edit-btn'])){
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="price" class="form-label">Price</label>
-                        <input type="text" name="price" class="form-control" min="1" id="price" value="<?=$fillinput['price'];?>" required>
+                        <label for="edit-price" class="form-label">Price</label>
+                        <input type="text" name="edit-price" class="form-control" min="0" value="<?=$fillinput['price'];?>" required>
                     </div>
                     <div class="mb-3">
-                        <label for="qty" class="form-label">Qty</label>
-                        <input type="number" name="qty" class="form-control" min="0" id="qty" value="<?=$fillinput['qty'];?>" required>
+                        <label for="edit-qty" class="form-label">Qty</label>
+                        <input type="number" name="edit-qty" class="form-control" min="0"  value="<?=$fillinput['qty'];?>" required>
                     </div>               
                     <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
-                        <select name="category" id="category" class="form-control mb-2">
+                        <label for="edit-category" class="form-label">Category</label>
+                        <select name="edit-category" id="edit-category" class="form-control mb-2">
                             <option value="" disabled>Select Category</option>
                             <?php
                                 $categories = (new CRUD($pdo))->select('category',[],[],'','');
@@ -313,8 +559,8 @@ if(isset($_POST['edit-btn'])){
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="era" class="form-label">Era</label>
-                        <select name="era" id="era" class="form-control mb-2">
+                        <label for="edit-era" class="form-label">Era</label>
+                        <select name="edit-era" id="edit-era" class="form-control mb-2">
                             <option value="" disabled>Select Era</option>
                             <?php
                                 $era = (new CRUD($pdo))->select('era',[],[],'','');
@@ -333,7 +579,7 @@ if(isset($_POST['edit-btn'])){
                         <input type="file" name="image[]" class="form-control" multiple >
                     </div>
                     
-                    <button type="submit" name="edit-btn" class="btn btn-primary w-100">Update</button>
+                    <button type="submit" name="update-btn" class="btn btn-primary w-100">Update</button>
                 </form>
             </div>
         <!-- </div> -->
