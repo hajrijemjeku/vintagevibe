@@ -18,7 +18,7 @@
                     $defaultImageId = $images[0]['id'] ?? null;
 
                 }
-                if($productdetails['qty']==1){
+                if($productdetails['qty']>0){
             ?>
             <?php if(!empty($images)):
                    foreach ($images as $image): ?>
