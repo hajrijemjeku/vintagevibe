@@ -250,7 +250,7 @@ if(isset($_POST['add-to-cart'])){
                         
                         $images = $crudObj->select('image',['src','alt'],['productid'=>$product['id']] ,'', '');
                         $image = $images->fetchAll();   
-                        if($product['qty']==1): 
+                        if($product['qty']>0): 
                  ?>
 
                 <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
