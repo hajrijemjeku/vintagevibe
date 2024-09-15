@@ -29,7 +29,36 @@ if(isset($_POST['edit-btn'])){
 
         $updateproduct = (new CRUD($pdo)) -> update('product',['name','size','price','qty','eraid','categoryid'],[$_POST['name'],$_POST['size'],$_POST['price'],$_POST['qty'],$_POST['era'],$_POST['category']],['id'=>$_POST['id']]);
 
-        header('Location:manage-products.php');
+        $images = $_FILES['image'];
+        
+        if($updateproduct){
+            
+            $image_uploaded = $images['name'];
+
+            if(isset($images) && count($image_uploaded)>0){
+                foreach($image_uploaded as $key => $image_name){
+    
+                    $img_tempname = $images['tmp_name'][$key];
+                    $img_newname = time() . '-'. $image_name;
+    
+                    if(move_uploaded_file($img_tempname, 'assets/images/products/'.$img_newname)){
+                        $updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['id']]);
+                        //$insertImage = (new CRUD($pdo))->insert('image', ['productid', 'src'], [$_POST['id'], $img_newname]);
+                        if (!$updateImage) {
+                            $errors[] = "Failed to update image $image_name";
+                        }
+                    } else{
+                        $errors[] = 'Image could not upload';
+                    }
+                }
+                //header('Location:manage-products.php');
+            }
+            header('Location:manage-products.php');
+        }else{
+            $errors[] = 'Product could not update';
+        }
+        
+        //header('Location:manage-products.php');
         // exit;
 
 
@@ -46,6 +75,54 @@ if(isset($_POST['edit-btn'])){
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true):
     if(!(isset($_SESSION['is_user']) && $_SESSION['is_user'] == true)): 
 ?>
+<?php
+    if(isset($_POST['addproduct'])) {
+
+        $name = $_POST['name'];
+        $price = $_POST['price'];
+        $qty = $_POST['qty'];
+        $size = $_POST['size'];
+        $category = $_POST['category'];
+        $era = $_POST['era'];
+        $images = $_FILES['image'];
+
+        if(!empty($name) && !empty($price) && !empty($qty) && !empty($size) && !empty($category) && !empty($era)){
+
+            $crudObj = new CRUD($pdo);
+
+            if($addProduct = $crudObj->insert('product',['name','price','size','qty','categoryid','eraid'],[$name, $price, $size, $qty, $category, $era])){
+
+                $productId = $pdo->lastInsertId();
+                $image_uploaded = $_FILES['image']['name'];
+
+                if(isset($images) && count($image_uploaded)>0){
+
+                    foreach($image_uploaded as $key => $image_name){
+
+                        $img_tempname = $images['tmp_name'][$key];
+                        $img_newname = time() . '-'. $image_name;
+
+                        if(move_uploaded_file($img_tempname, 'assets/images/products/'.$img_newname)){
+                            $insertImage = $crudObj->insert('image',['productid','src'],[$productId, $img_newname]);
+                        }
+                    }
+                    header('Location:manage-products.php');
+                } else{
+                    $errors[] = 'Image was not added!';
+                }
+            } 
+            else {
+                $errors[] = 'Product was not added!';
+            }
+                
+        }
+        // if($errors) {
+        //     echo '<pre>';
+        //     print_r($errors);
+        //     echo '</pre>';
+        // } 
+    }
+?>
     <section class="manage-products py-5">
         <div class="container">
         <div class="search mb-3 w-100" style="margin-left:920px;">
@@ -57,6 +134,9 @@ if(isset($_POST['edit-btn'])){
             <h2 class="text-center">My Products (<?= count($products); ?>)</h2>
         
         <div class="row mt-4">
+            <button type="submit" class="btn btn-outline-success add-product-btn w-25 mx-auto mb-4"  data-bs-toggle="modal"  data-bs-target="#addProductModal" data-residence-id="">
+                Add new Product
+            </button>
             <table class="table">
                 <tr>
                     <!-- <th>Id</th> -->
@@ -70,7 +150,6 @@ if(isset($_POST['edit-btn'])){
                 </tr>
             <?php foreach($products as $product): ?>
                 <tr>
-                    <!-- <td><?//= $myresidence['userid'] ?></td> -->
                     <td><?= $product['name'] ?></td>
                     <td><?= $product['size'] ?></td>
                     <td><?= $product['price'] ?>&euro;</td>
@@ -88,15 +167,94 @@ if(isset($_POST['edit-btn'])){
         </div>
         <?php endif; ?>
 
+        <!-- Modal Structure -->
+        <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addProductModalLabel">Add a new Product</h5>
+                            <button type="submit" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"> &times; </span>
+                            </button>
+                        </div>
+                        <form id="productForm" action="<?= $_SERVER['PHP_SELF'] ?>" method="POST"  enctype="multipart/form-data" >
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="id" name="id" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Name:</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Price:</label>
+                                    <input type="text" class="form-control" id="price" name="price" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="qty">Qty:</label>
+                                    <input type="number" class="form-control" min="0" id="qty" name="qty" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select name="category" id="category" class="form-control mb-2">
+                                        <option value="">Select Category</option>
+                                        <?php
+                                            $categories = (new CRUD($pdo))->select('category',[],[],'','');
+                                            $categories = $categories->fetchAll();
+                                            
+                                            foreach($categories as $category):
+                                        ?>
+                                        <option value="<?= $category['id']; ?>" required><?= $category['name']; ?></option>
+                                            <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="size" class="form-label">Size</label>
+                                    <select name="size" id="size" class="form-control mb-2">
+                                        <option value="">Select Size</option>
+                                        <?php
+                                            $sizes = (new CRUD($pdo))->distinctSelect('product','size');
+                                            $sizes = $sizes->fetchAll();
+                                            
+                                            foreach($sizes as $size):
+                                        ?>
+                                        <option value="<?= $size['size']; ?>"><?= $size['size']; ?></option>
+                                            <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="era" class="form-label">Era</label>
+                                    <select name="era" id="era" class="form-control mb-2">
+                                        <option value="">Select Era</option>
+                                        <?php
+                                            $era = (new CRUD($pdo))->select('era',[],[],'','');
+                                            $era = $era->fetchAll();
+                                            
+                                            foreach($era as $years):
+                                        ?>
+                                        <option value="<?= $years['id']; ?>" required><?= $years['name']; ?></option>
+                                            <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="image" class="form-label">Image</label>
+                                    <input type="file" name="image[]" class="form-control" id="image" multiple required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button name="addproduct" type="submit" class="btn btn-primary">Save Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         <?php if(isset($_GET['action']) && $_GET['action']=='edit'): 
             
                 $fillinputs = (new CRUD($pdo))->select('product',[],['id'=>$_GET['id']],1,'');
                 if($fillinputs):
                     $fillinput = $fillinputs->fetch();
-                    // $fullname = (new CRUD($pdo))->select('person',['name','surname','email'],['id'=>$fillinput['personid']],1,'');
-                    // $fullname = $fullname->fetch();
-
-                
             
             ?>
             
@@ -172,7 +330,7 @@ if(isset($_POST['edit-btn'])){
                     
                     <div class="mb-3">
                         <label for="image" class="form-label">Image</label>
-                        <input type="file" name="image" class="form-control" id="image" >
+                        <input type="file" name="image[]" class="form-control" multiple >
                     </div>
                     
                     <button type="submit" name="edit-btn" class="btn btn-primary w-100">Update</button>
