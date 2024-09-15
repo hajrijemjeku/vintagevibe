@@ -36,11 +36,65 @@ if(isset($_POST['edit-btn'])){
 
 }
 
-
 ?>
+
+
 <?php 
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true):
     if(isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == true): 
+?>
+<?php 
+    if(isset($_POST['submitreview'])) {
+
+        $name = $_POST['name'];
+        $surname = $_POST['surname'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $confirmpassword = $_POST['confirm-password'];
+        $address = $_POST['address'];
+        $city = $_POST['city'];
+        $country = $_POST['country'];
+        $roleid = $_POST['role'];
+
+        if(!empty($email) && !empty($password)){
+
+            if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+                if($password == $confirmpassword){
+                    $password = password_hash($password, PASSWORD_BCRYPT);
+                    $crudObj = new CRUD($pdo);
+                    $allusers = $crudObj->select('person',[],['email'=> $email],'','');
+                    $allusers = $allusers->fetch();
+                    
+                    if($allusers){
+                        $errors[] = 'Ths email is already registered';
+                    }else{
+                        if(empty($roleid)){
+                            $errors[] = 'Fill user`s role';
+                        }
+                        else if($registerUser = $crudObj->insert('person',['name','surname','email','password','address','city','country','roleid'],[$name,$surname, $email, $password, $address, $city, $country,$roleid])){
+                            header('Location:manage-users.php');
+                        } else{
+                            $errors[] = 'Something went wrong';
+                        }
+                    }
+                } else {
+                    $errors[] = 'Passwords do not match!';
+                }
+                
+            }else{
+                $errors[] = 'Email was not valid';
+            }
+        }else{
+            $errors[] = 'Fill both email and password fields!';
+        }   
+        // if($errors) {
+        //     echo '<pre>';
+        //     print_r($errors);
+        //     echo '</pre>';
+        // } 
+    }
+        
+
 ?>
     <section class="manage-users py-5">
         <div class="container">
@@ -49,13 +103,15 @@ if(isset($_POST['edit-btn'])){
                 <input class="w-50" type="search" name="search-users" value="<?= isset($_GET['search-users']) && !empty($_GET['search-users']) ? $_GET['search-users'] : '' ?>" placeholder="Search based on user name" >
             </form>
         </div>
-        <?php if(count($errors) > 0): ?>
+
+        <?php if($errors): ?>
             <div class="alert alert-warning">
                 <?php foreach($errors as $error): ?>
-                    <p class="p-0 m-0"><?= $error; ?></p>
+                    <p class="p-0 m-0"><?php echo $error; ?></p>
                 <?php endforeach;?>
             </div>
-            <?php endif;?>
+        <?php endif; ?>
+        
         <?php if(count($users) > 0): ?>
             <h2 class="text-center">Users (<?= count($users); ?>)</h2>
         
@@ -66,7 +122,12 @@ if(isset($_POST['edit-btn'])){
                     <th>Name</th>
                     <th>Surname</th>
                     <th>Email</th>
-                    <th>Action</th>
+                    <th style="width: 250px;;">Action</th>
+                    <th style="width:100px;">
+                        <button type="submit" class="btn btn-outline-success add-review-btn"  data-bs-toggle="modal"  data-bs-target="#addReviewModal" data-residence-id="">
+                            Add user
+                        </button>
+                    </th>
                 </tr>
                 <?php foreach($users as $user): 
                     if($user['id'] == $_SESSION['user_id'] && $_SESSION['user_id'] == $_SESSION['is_admin']){
@@ -88,6 +149,78 @@ if(isset($_POST['edit-btn'])){
             <?php else: echo '<p>0 Users </p>'; ?>
         </div>
         <?php endif; ?>
+
+            <!-- Modal Structure -->
+            <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addReviewModalLabel">Add a new User</h5>
+                            <button type="submit" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"> &times; </span>
+                            </button>
+                        </div>
+                        <form id="reviewForm" action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" id="id" name="id" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Name:</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="surname">Surname:</label>
+                                    <input type="text" class="form-control" id="surname" name="surname" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email:</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password:</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirm Password:</label>
+                                    <input type="password" class="form-control" id="confirm-password" name="confirm-password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="address">Address:</label>
+                                    <input type="text" class="form-control" id="address" name="address" >
+                                </div>
+                                <div class="form-group">
+                                    <label for="city">City:</label>
+                                    <input type="text" class="form-control" id="city" name="city" >
+                                </div>
+                                <div class="form-group">
+                                    <label for="country">Country:</label>
+                                    <input type="text" class="form-control" id="country" name="country" >
+                                </div>
+                                <div class="form-group">
+                                    <label for="role" class="form-label">Role</label>
+                                    <select name="role" id="role" class="form-control mb-2">
+                                        <option value="">Select Role</option>
+                                        <?php
+                                            $roles = (new CRUD($pdo))->select('role',[],[],'','');
+                                            $roles = $roles->fetchAll();
+                                            
+                                            foreach($roles as $role):
+                                        ?>
+                                        <option value="<?= $role['id']; ?>" required><?= $role['name']; ?></option>
+                                            <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button name="submitreview" type="submit" class="btn btn-primary">Save User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
 
         <?php if(isset($_GET['action']) && $_GET['action']=='edit'): 
             
