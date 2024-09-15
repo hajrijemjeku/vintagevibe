@@ -54,7 +54,7 @@ if(isset($_GET['action']) && ($_GET['action']) == 'edit'){
 
 ?>
 <?php
-//my code
+//different logic
 // if(isset($_POST['update-btn'])){
 
 //     if((!empty($_POST['edit-name'])) && (!empty($_POST['edit-size'])) && (!empty($_POST['edit-price'])) && (!empty($_POST['edit-qty'])) && (!empty($_POST['edit-era'])) && (!empty($_POST['edit-category']))){
@@ -229,6 +229,8 @@ if(isset($_GET['action']) && ($_GET['action']) == 'edit'){
 
 //chatgpt version2 code
 if (isset($_POST['update-btn'])) {
+    
+    if(isset($_POST['update-btn'])){
     $requiredFields = ['edit-name', 'edit-size', 'edit-price', 'edit-qty', 'edit-era', 'edit-category'];
   
     foreach ($requiredFields as $field) {
@@ -276,7 +278,7 @@ if (isset($_POST['update-btn'])) {
                 }
 
                 // Add new images if there are more uploaded images than existing images
-                while ($imageIndex < $imageCount) { //imageIndex value it starts where it left inside foreach.
+                while ($imageIndex < $imageCount) { //imageIndex value starts where it left inside foreach
                     $imgTempName = $images['tmp_name'][$imageIndex];
                     $imgNewName = time() . '-' . $imageNames[$imageIndex];
 
@@ -309,12 +311,8 @@ if (isset($_POST['update-btn'])) {
         echo '</pre>';
     }
 
-    // Print POST data for debugging
-    echo '<pre>';
-    print_r($_POST);
-    echo '</pre>';
-}
 
+}
 ?>
 
 <?php 
