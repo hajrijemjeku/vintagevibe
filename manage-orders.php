@@ -75,7 +75,7 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
                     <th>Total</th>
                     <th>Status</th>
                     <?php if(isset($_SESSION["is_admin"]) && ($_SESSION["is_admin"] == true)) { ?>
-                    <th>Delete</th>
+                    <th>Action</th>
                     <?php } ?>
                 </tr>
                 <?php foreach($orders as $order): ?>
@@ -89,16 +89,21 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
                         <td><?= $order['total'] ?> &euro;</td>
                         <?php if($order['send_status']=='sent'){ ?>
                             <td style="color:green;"><?= $order['send_status'] ?></td>
-                        <?php } else{ ?>
+                        <?php } else if($order['send_status']=='cancelled'){?>
+                            <td style="color:grey;">Order has been <?= $order['send_status'] ?>.</td>
+                            <?php } else{ ?>
                         <td>
                             <form action="<?= $_SERVER['PHP_SELF'];?>" method="post">
                                 <input type="hidden" name="order_id" value="<?= $order['id'] ?>" />
-                                <input style="background: none; border: none; cursor: pointer; color:red;" type="submit" name="sentorder" value="<?= $order['send_status'] ?>"/>
+                                <input style="background: none; border: none; cursor: pointer; color:red;" title="send order" type="submit" name="sentorder" value="<?= $order['send_status'] ?>"/>
                             </form> 
                         </td> <?php } ?>
                         <?php if(isset($_SESSION["is_admin"]) && ($_SESSION["is_admin"] == true)) { ?>
                         <td>
-                            <a class="btn btn-sm btn-danger" href="?action=delete&id=<?= $order['id'] ?>" onclick="return confirm('Are you sure?');">x</a>
+                            <a class="btn btn-sm btn-danger" href="?action=delete&id=<?= $order['id'] ?>" onclick="return confirm('Are you sure?');">delete</a> 
+                            <?php if(($order['send_status']=='pending')): ?>
+                            /<a class="btn btn-sm btn-secondary" href="?action=cancel&id=<?= $order['id'] ?>" onclick="return confirm('Are you sure?');">cancel</a> <?php endif; ?>
+
                         </td>
                         <?php } ?>
 
@@ -106,6 +111,27 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
 
                     <?php
                     if(isset($_SESSION["is_admin"]) && ($_SESSION["is_admin"] == true)) {
+
+                        if(isset($_GET['action']) && $_GET['action'] == 'cancel'){
+                            $orderId = $_GET['id'];
+                            $order = (new Crud($pdo))->update('orders', ['send_status'], ['cancelled'], ['id'=> $orderId]);
+                            $orders = (new Crud($pdo))->select('orders', [], ['id'=> $orderId], '','')->fetch();
+
+                            if($order && $orders['send_status'] === 'cancelled'){
+                    
+                                $orderproduct = (new Crud($pdo))->select('order_product',[],['orderid'=> $orderId],'','orderid');
+                                $orderproduct = $orderproduct->fetchAll();
+                                foreach($orderproduct as $op){
+                                    $updatestock = (new Crud($pdo))->update('product',['qty'],[1],['id'=>$op['productid']]);
+
+                                    if(!$updatestock){
+                                        echo "Failed to update stock for productID: " . $op['productid'];
+                                        exit;
+                                    }
+                                }
+                            }
+                            header('Location:manage-orders.php');
+                        }
 
                         if(isset($_GET['action']) && $_GET['action'] == 'delete'){
                             $orderId = $_GET['id'];
