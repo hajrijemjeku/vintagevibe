@@ -1,7 +1,7 @@
 <?php include('includes/header.php'); ?>
 
 <?php
-$errors[] = '';
+$errors = [];
 if(!(isset($_SESSION['logged_in'])) && !($_SESSION['logged_in'] == true)){
     header('Location:signin.php');
 }
@@ -138,7 +138,7 @@ if(isset($_GET['action']) && ($_GET['action']) == 'edit'){
 
 //final code
     
-    if(isset($_POST['update-btn'])){
+if(isset($_POST['update-btn'])){
     $requiredFields = ['edit-name', 'edit-size', 'edit-price', 'edit-qty', 'edit-era', 'edit-category'];
   
     foreach ($requiredFields as $field) {
