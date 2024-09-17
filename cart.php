@@ -36,7 +36,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
     </tr>
     <?php endforeach; ?>
     <tr>
-        <td colspan='4'></td>
+        <td colspan='5'></td>
         <td><h5><?=$total?>&euro;</h5></td>
         <td></td>
     </tr>
