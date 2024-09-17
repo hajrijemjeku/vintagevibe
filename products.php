@@ -1,10 +1,5 @@
 <?php include ('includes/header.php'); ?>
 
-<?php 
-
-
-
-?>
 <style>
     .out-of-stock-overlay {
         position: absolute;
@@ -87,9 +82,6 @@
                 $crudObj = new Crud($pdo);
                 $products = $crudObj->select('product',[],['price <= ' => $price], '', '');
                 $products = $products->fetchAll();
-                // $prices = array_column($products, 'price');
-                // // Find the maximum price
-                // $maxPrice = max($prices);
 
             }
             
@@ -100,18 +92,12 @@
                     $crudObj = new Crud($pdo);
                     $products = $crudObj->search('product', ['id', 'name', 'price','size', 'qty'], ['eraid' => $eraId],'');
                     $products = $products->fetchAll();
-                    // $prices = array_column($products, 'price');
-                    // // Find the maximum price
-                    // $maxPrice = max($prices);
                 }
                 if($categoryId) {
                     //$eraId = isset($_GET['era_id']);
                     $crudObj = new Crud($pdo);
                     $products = $crudObj->search('product', ['id', 'name', 'price','size','qty'], ['categoryid' => $categoryId],'');
                     $products = $products->fetchAll();
-                    // $prices = array_column($products, 'price');
-                    // // Find the maximum price
-                    // $maxPrice = max($prices);
                 } 
                 if(!$eraId && !$categoryId){
                     $crudObj = new Crud($pdo);
