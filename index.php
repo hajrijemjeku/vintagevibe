@@ -101,17 +101,105 @@ if(isset($_POST['add-to-cart'])){
         z-index: 10; /* Ensure it appears above other content */
         opacity: 0.5; /* Adjust opacity if needed */
     }
+
+    .carousel-item {
+    position: relative;
+}
+
+.carousel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5); /* Optional: Add a semi-transparent background */
+}
+
+
+.carousel-overlay p {
+    position: absolute;
+    color: white;
+    font-size: 84px; /* Adjust the size as needed */
+    font-family: 'Allan';
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Optional: Add a shadow for better readability */
+    opacity: 0.5;
+    color:#7b9b77;
+    
+}
+
+.btn-outline-primary {
+    color: #7b9b77; /* Text color */
+    border-color: #7b9b77; /* Border color */
+}
+
+.btn-outline-primary:hover {
+    color: #fff; /* Text color on hover */
+    background-color: #7b9b77; /* Background color on hover */
+    border-color: #7b9b77; /* Border color on hover */
+}
+
+.btn-outline-primary:focus, 
+.btn-outline-primary.focus {
+    box-shadow: 0 0 0 0.2rem rgba(123, 155, 119, 0.5); /* Focus shadow color */
+}
+#span-price {
+    color:#7b9b77;
+}
+
 </style>
+
+
+<section class="slider" style="position:relative;">
+    <div id="carouselExampleIndicators" class="carousel slide">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner p-3 my-3">
+            <div class="carousel-item active">
+                <img src="./assets/images/slider/1.jpg" class="d-block w-100" height="450px" alt="...">
+                <div class="carousel-overlay">
+                    <p>Vintage Vibe</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="./assets/images/slider/2.jpg" class="d-block w-100" height="450px" alt="...">
+                <div class="carousel-overlay">
+                    <p>Vintage Vibe</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="./assets/images/slider/3.jpg" class="d-block w-100" height="450px" alt="...">
+                <div class="carousel-overlay">
+                    <p>Vintage Vibe</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
 <section class="index py-5">
-    <div class="container" style="background-color:lightblue">
-        <h2 class="text-center">All Products</h2>
+    <div class="container" style="background-color:rgba(116, 148, 100, 0.1)">
+        <h2 class="text-center">Our Products</h2>
         <div class="row mt-4">
             <div class="col-12">
                 <div class="text-center">
                     <form action="<?= $_SERVER['PHP_SELF']?>" method="get" class="d-inline">
                         <button class="btn btn-outline-primary" title="Nga me e shtrenjta tek me e lira" type="submit" name="down">
                             <i class="fa fa-arrow-down"></i>
-                        </button><span class="text-primary"> Price </span>
+                        </button><span id="span-price"> Price </span>
                         <button class="btn btn-outline-primary" title="Nga me e lira tek me e shtrenjta" type="submit" name="up">
                             <i class="fa fa-arrow-up"></i>
                         </button>
