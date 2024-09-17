@@ -43,6 +43,7 @@ ob_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VintageVibe</title>
+    <link href='https://fonts.googleapis.com/css?family=Allan' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -59,13 +60,13 @@ ob_start();
         <!-- <nav class="navbar navbar-expand-lg fixed-top bg-light navbar-light"> -->
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
         
-            <div style="background-color: #dcaac0;"  class="w-100">
+            <div style="background-color: #cebfb2;"  class="w-100">
             <div class="container">
                 <div class="row d-flex align-items-center py-3">
                 <div class="col-12 d-flex justify-content-between mb-3 mt-4">
                     <div>
                         <a style="margin-left:480px;" class="navbar-brand" href="#">
-                            <img id="logo" src="assets/images/logo.png" alt="vintagevibe Logo" draggable="false" width="350"/>
+                            <img id="logo" src="assets/images/newlogo.png" alt="vintagevibe Logo" draggable="false" width="350"/>
                         </a>
                     </div>
 
@@ -94,7 +95,7 @@ ob_start();
                                 <?php endif; ?>
                                 <?php if(isset($_SESSION['is_manager']) && ($_SESSION['is_manager'] === true)): ?>
                                     <li class="nav-item">
-                                        <a class="nav-link mx-2 text-white" href="manage.php">Manage</a>
+                                        <a class="nav-link mx-2 text-white" href="dashboard.php">Dashboard</a>
                                     </li>
                                 <?php endif; ?>
                                 <?php if(isset($_SESSION['is_user']) && ($_SESSION['is_user'] === true)): ?>
