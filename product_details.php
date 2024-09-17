@@ -1,5 +1,100 @@
 <?php include('includes/header.php');
+
+// Initialize wishlist if not set
+if (!isset($_SESSION['wishlist'])) {
+    $_SESSION['wishlist'] = [];
+}
+// Handle adding/removing items from the wishlist
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && isset($_POST['product_id'])) {
+        $product_id = $_POST['product_id'];
+
+        if ($_POST['action'] === 'add') {
+            if (!in_array($product_id, $_SESSION['wishlist'])) {
+                $_SESSION['wishlist'][] = $product_id;
+            }
+        } elseif ($_POST['action'] === 'remove') {
+            $_SESSION['wishlist'] = array_diff($_SESSION['wishlist'], [$product_id]);
+        }
+    }
+}
+$wishlistItems = $_SESSION['wishlist'];
 ?>
+
+<?php
+if(isset($_POST['add-to-cart'])){
+    $product_id = $_POST['product_id'];
+    $product_name = $_POST['name'];
+    $product_size = $_POST['size'];
+    $product_price = $_POST['price'];
+    $product_qty = $_POST['qty'];
+
+
+    if(isset($_SESSION['cart'])){
+        if(array_key_exists($product_id, $_SESSION['cart'])){ ?>
+            <script>alert('already added to cart')</script>
+            
+        <?php
+        }else{
+            $_SESSION['cart'][$product_id] = [
+                'id' => $product_id,
+                'name' => $product_name,
+                'size' => $product_size,
+                'price' => $product_price,
+                'qty' => $product_qty
+
+            ];
+        }
+    }else{
+        $_SESSION['cart'] = [];
+        $_SESSION['cart'][$product_id] = [
+            'id' => $product_id,
+            'name' => $product_name,
+            'size' => $product_size,
+            'price' => $product_price,
+            'qty' => $product_qty
+        ];
+
+    }
+    header('Location:cart.php');
+
+}
+
+
+?>
+
+<style>
+    .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            position: relative;
+    }
+    
+    .card img {
+        width: 100%;
+        /* height: auto; */
+    }
+    .btn-wishlist {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+    }
+    .btn-cart {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 10px;
+    }
+    .btn-cart:hover{
+        background:rgb(14, 154, 101);
+        border-radius: 50px;
+
+    }
+</style>
 <section class="product-details py-5">
     <div class="container mt-4">
         <h2 class="text-center">product_details.php</h2>
@@ -9,10 +104,10 @@
             <?php
                 if(isset($_GET['product_id']) && !(empty($_GET['product_id']))){
                     $crudObj = new Crud($pdo);
-                    $productdetails = $crudObj->select('product',['id','name','price','size','qty'],['id'=>$_GET['product_id']],'','');
+                    $productdetails = $crudObj->select('product',[],['id'=>$_GET['product_id']],'','');
                     $productdetails = $productdetails->fetch();
 
-                    $images = $crudObj->select('image',['id','src','alt','productid'],['productid'=> $_GET['product_id']],'','');
+                    $images = $crudObj->select('image',[],['productid'=> $_GET['product_id']],'','');
                     $images = $images->fetchAll();
 
                     $defaultImageId = $images[0]['id'] ?? null;
@@ -45,10 +140,34 @@
 
                 </div>
                 <div class="p-3 border mt-3">
-                    <h4>Product Info</h4>
-                    <p>Name:<?php echo $productdetails['name']; ?></p>
-                    <p>Price:<?php echo $productdetails['price']; ?> &euro;</p>
-                    <p>Size:<?php echo $productdetails['size']; ?></p>
+                    <!-- <h4>Product Info</h4>
+                    <p>Name:<?//php echo $productdetails['name']; ?></p>
+                    <p>Price:<?//php echo $productdetails['price']; ?> &euro;</p>
+                    <p>Size:<?//php echo $productdetails['size']; ?></p> -->
+
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="product_id" value="<?= $productdetails['id'] ?>">
+                        <?php if (in_array($productdetails['id'], $wishlistItems)): ?>
+                                <input type="hidden" name="action" value="remove">
+                                <button class="btn-wishlist"><i class="fa-solid fa-heart"></i></button>
+                        
+                        <?php else: ?>
+                                <input type="hidden" name="action" value="add">
+                                <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
+                    
+                        <?php endif; ?>
+                    </form>
+                    <?php if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'] === true)): ?>
+                        <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST" class="d-inline" style="margin-left:140px;">
+                            <input type="hidden" name="product_id" id="product_id" value="<?= $productdetails['id'] ?>">
+                            <input type="hidden" name="name" value="<?= $productdetails['name'] ?>">
+                            <input type="hidden" name="size"  value="<?= $productdetails['size'] ?>">
+                            <input type="hidden" name="price"  value="<?= $productdetails['price'] ?>">
+                            <input type="hidden" name="qty"  value="<?= $productdetails['qty'] ?>">
+
+                            <button name="add-to-cart" id="add-to-cart" class="btn-cart" type="submit">Add to cart   <i class="fa-solid fa-cart-shopping"></i></i></button>
+                        </form>
+                    <?php endif; ?>
 
                 </div>
 
@@ -66,13 +185,14 @@
             <h3 class=" text-secondary">Similar products</h3>
             <div class="row mt-4">
                 <?php
-                    $similarproducts = $crudObj->search('product',['id','name','price','size'],['name'=>$productdetails['name']],'');
+                    $similarproducts = $crudObj->search('product',['id','name','price','size','qty'],['name'=>$productdetails['name'], 'size'=>$productdetails['size']],'');
                     $similarproducts = $similarproducts->fetchAll();
                     
                     foreach($similarproducts as $similarproduct):
                         $images = $crudObj->select('image',['id','src','alt','productid'],['productid'=> $similarproduct['id']],'','');
                         $images = $images->fetchAll();
                         if(!($similarproduct['id']== $productdetails['id'])){
+                            if($similarproduct['qty']>0){
                 ?>
                 <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
                     <a href="product_details.php?product_id=<?=$similarproduct['id'];?>" class="text-decoration-none">
@@ -84,6 +204,7 @@
                                 <p class="card-text"> 
                                     Price: <strong> <?php echo number_format($similarproduct['price'],2);  ?> &euro; </strong> / Size: <strong><?= $similarproduct['size'] ?> </strong>
                                 </p>
+                                
 
                             </div>
                         </div>
@@ -92,13 +213,13 @@
 
 
                 <?php
-                        }else{ continue;} endforeach;
+                        }}else{ continue;} endforeach;
                 ?>
 
             </div>
 
         </div>
-        <?php } else{ header('Location:index.php');} ?>
+        <?php } else{ header('Location:products.php');} ?>
     </div>
     <!-- <script>
         document.querySelectorAll('.small-image').forEach(function(img) {
