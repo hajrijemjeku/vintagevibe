@@ -57,13 +57,9 @@ if(isset($_POST['add-to-cart'])){
         ];
 
     }
-    header('Location:index.php');
+    header('Location:cart.php');
 
 }
-
-
-
-
 
 ?>
 <style>
@@ -72,29 +68,26 @@ if(isset($_POST['add-to-cart'])){
             border-radius: 8px;
             padding: 16px;
             margin: 16px;
+            position: relative;
         }
     
-        .card img {
-            width: 100%;
-            /* height: auto; */
-        }
-        .btn-wishlist {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-        }
-        .btn-cart {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-        }
-
-
-        .card {
-        position: relative;
+    .card img {
+        width: 100%;
+        /* height: auto; */
     }
+    .btn-wishlist {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+    }
+    .btn-cart {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+    }
+
 
     .out-of-stock-overlay {
         position: absolute;
@@ -333,12 +326,6 @@ if(isset($_POST['add-to-cart'])){
                         </div>
                     <!-- </a> -->
                     </div>
-                
-                
-                
-                
-                
-                
                 
                 
                 <?php endif; endwhile; ?>
