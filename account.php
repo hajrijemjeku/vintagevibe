@@ -8,7 +8,7 @@ $errors = [];
 $account = (new CRUD($pdo))->select('person',[],['id'=> $_SESSION['user_id']],1,'');
 
 if(!(isset($_SESSION['logged_in'])) && !($_SESSION['logged_in'] == true)){
-    header('Location:login.php');}
+    header('Location:signin.php');}
 
                   
 if($account){
@@ -45,9 +45,9 @@ if(isset($_POST['update-btn'])){
 
 <section class="account my-5">
     <div class="container d-flex justify-content-center">
-        <div class="account-form w-50  p-4 shadow rounded bg-light">
+        <div class="account-form w-50  p-4 shadow rounded" style="background-color:rgba(116, 148, 100, 0.1)">
             <div class="text-center mb-4">
-                <h3 class="mb-3 text-secondary">My Account</h3>
+                <h3 class="mb-3 text-center" style="font-family: Arial, sans-serif; font-weight: bold; color: #7b9b77;">My Account</h3>
             </div>
             <?php if(count($errors)>0): ?>
             <div class="alert alert-warning">
@@ -65,11 +65,11 @@ if(isset($_POST['update-btn'])){
             <form method="POST" action="<?= $_SERVER['PHP_SELF'] ?>">
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
-                    <input type="text" name="name" class="form-control" id="name"  value="<?= $account['name'] ?>" >
+                    <input type="text" name="name" class="form-control" id="name"  value="<?= $account['name'] ?>" required >
                 </div>
                 <div class="mb-3">
                     <label for="surname" class="form-label">Surname</label>
-                    <input type="text" name="surname" class="form-control" id="surname"  value="<?= $account['surname'] ?>" >
+                    <input type="text" name="surname" class="form-control" id="surname"  value="<?= $account['surname'] ?>" required >
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
