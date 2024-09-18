@@ -192,7 +192,8 @@ if(isset($_POST['add-to-cart'])){
 
 <section class="index py-5">
     <div class="container" style="background-color:rgba(116, 148, 100, 0.1)">
-        <h2 class="text-center">Our Products</h2>
+        <h2 class="text-center" style="font-family: Arial, sans-serif; font-weight: bold; color: #7b9b77;">Our Products</h2>
+
         <div class="row mt-4">
             <div class="col-12">
                 <div class="text-center">
@@ -334,9 +335,9 @@ if(isset($_POST['add-to-cart'])){
                         if($product['qty']>0): 
                  ?>
 
-                <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
+                <div class="col-lg-3 col-md-3 col-sm-12 mb-3" >
                     <a href="product_details.php?product_id=<?=$product['id'];?>" class="text-decoration-none">
-                        <div class="card" style="width: 18rem;">
+                        <div class="card" style="width: 18rem; height:500px;">
                             <input type="hidden" name="product_id" id="product_id" value="<?= $product['id'] ?>">
                             <img src="./assets/images/products/<?= $image[0]['src']; ?>" class="card-img-top" alt="<?= $image[0]['alt']; ?>" height="300px">
                             <div class="card-body">
