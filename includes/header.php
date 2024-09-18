@@ -2,14 +2,7 @@
 include 'db.php';
 ob_start();
 
-//ob_start();
 //error_reporting(E_ALL);
-// $crudObj = new Crud($pdo);
-
-
-// if (!isset($_SESSION['cart'])) {
-//     $_SESSION['cart'] = [];
-// }
     
     spl_autoload_register(function ($class_name) {
         include $class_name . '.php';
@@ -26,15 +19,11 @@ ob_start();
         if(isset($_SESSION['is_manager'])){unset($_SESSION['is_manager']);};
         if(isset($_SESSION['is_user'])){unset($_SESSION['is_user']);};
 
-        header('Location:index.php');
+        header('Location:signin.php');
 
     }
 
-
-
 ?>
-
- <!-- Your HTML to display products -->
 
 
 <!DOCTYPE html>
@@ -82,11 +71,7 @@ ob_start();
                             </form>
                         <?php endif; ?>
                         <?php if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'] === true)): ?>
-                            <?php
-                            // echo '<pre>';
-                            // print_r($_SESSION); // Debugging output
-                            // echo '</pre>'; 
-                            ?>
+                           
                             <ul class="navbar-nav align-items-center mx-auto">
                                 <?php if(isset($_SESSION['is_admin']) && ($_SESSION['is_admin'] === true)): ?>
                                     <li class="nav-item">
@@ -98,9 +83,9 @@ ob_start();
                                         <a class="nav-link mx-2 text-white" href="dashboard.php">Dashboard</a>
                                     </li>
                                 <?php endif; ?>
-                                <?php if(isset($_SESSION['is_user']) && ($_SESSION['is_user'] === true)): ?>
+                                <?php if(isset($_SESSION['logged_in']) && ($_SESSION['logged_in'] === true)): ?>
                                     <li class="nav-item">
-                                        <a class="nav-link mx-2 text-white" href="my-orders.php">Orders</a>
+                                        <a class="nav-link mx-2 text-white" href="my-orders.php">My Orders</a>
                                     </li>
                                 <?php endif; ?>
                                 <li class="nav-item">
@@ -109,9 +94,7 @@ ob_start();
                                 <li class="nav-item">
                                     <a class="nav-link mx-2 text-white" href="?action=logout">SignOut</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link mx-2 text-white" href="wishlist.php">Wishlist</a>
-                                </li>
+                                
                             </ul>
 
                         <?php else: ?>
@@ -122,14 +105,10 @@ ob_start();
                             <li class="nav-item">
                                 <a class="nav-link mx-2 text-white" href="signin.php">SignIn</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link mx-2 text-white" href="wishlist.php">Wishlist</a>
-                            </li>
                         </ul>
                         <?php endif; ?>
 
                     </div>
-                    
                     
                 </div>
                 <div class="col-12 d-flex justify-content-center">
@@ -138,9 +117,6 @@ ob_start();
                         <li class="nav-item">
                             <a class="nav-link mx-2 text-white" href="index.php"><i class="fas fa-home pe-2" style="color:white "></i>Home</a>
                         </li>
-                        <!-- <li class="nav-item" style="margin-left:20px">
-                            <a class="nav-link mx-2 text-white" href="products.php"><i class="fa-solid fa-shirt pe-2" style="color:white"></i></i>Products</a>
-                        </li> -->
                         <li class="nav-item dropdown" style="margin-left:20px">
                             <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-bars-staggered pe-2"></i>
                             Category</a>
@@ -179,6 +155,11 @@ ob_start();
                                 <a class="nav-link mx-2 text-white" href="cart.php"><i class="fas fa-home pe-2" style="color:white "></i>Cart(<?= count($_SESSION['cart']); ?>)</a>
                             </li>
                         <?php endif; ?>
+                        <?php if(isset($_SESSION['wishlist']) && count($_SESSION['wishlist']) > 0): ?>
+                            <li class="nav-item">
+                                <a class="nav-link mx-2 text-white" href="wishlist.php">Wishtlist(<?= count($_SESSION['wishlist']); ?>)</a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                     </div>
                 </div>
@@ -186,6 +167,4 @@ ob_start();
             </div>
         </div>
         </nav>
-        <!-- Navbar -->
-        
     </header>
