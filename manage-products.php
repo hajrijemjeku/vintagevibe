@@ -232,7 +232,9 @@ if(isset($_POST['update-btn'])){
                     <td><?= $product['eraid'] ?></td>
                     <td><?= $product['categoryid'] ?></td>
                     <td>
+                    <?php if(isset($_SESSION['is_admin']) && ($_SESSION['is_admin'] === true)): ?>
                         <a href="?action=delete&id=<?=$product['id'];?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a> /
+                    <?php endif; ?>
                         <a href="?action=edit&id=<?=$product['id'];?>" class="btn btn-sm btn-secondary">Edit</a> 
                     </td>
                 </tr>
