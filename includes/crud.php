@@ -79,11 +79,10 @@ class Crud {
 
          $sql = "SELECT $columns FROM $table $whereClause $sort $limitClause";
          //echo $sql;
-        //die();         
+        // die();         
          
          return $this->pdo->query($sql);
 
-         //return $this->pdo->query($sql);
     }
 
     public function search($table, $columns = [], $where =[], $limit) {
@@ -103,7 +102,8 @@ class Crud {
         $vlerat = rtrim($vlerat,", ");
 
         $sql = "INSERT INTO $table ($kolonat) VALUES ($vlerat);";
-        
+        //echo $sql;
+        //print_r($sql);
         $query = $this->pdo->prepare($sql);
 
         return $query->execute($values);
@@ -114,11 +114,11 @@ class Crud {
         $where = $this->where($where);
         $kolonat = implode("= ? , ", $columns).  " = ?  " ;
         $sql = "UPDATE $table SET $kolonat $where ";
-        // echo $sql;
+        echo $sql;
+        print_r($sql);
         // die();
         $query = $this->pdo->prepare($sql);
         return $query->execute($values);
-        //update from residence set price='test', rooms = '' where id=4;
     }
 
     public function delete($table, $column, $value){
@@ -132,38 +132,11 @@ class Crud {
     }
 
 
-
-    // private function wherevalue($where = []){
-    //     $where_statement = "";
-    //     if(count($where) > 0) {
-    //         $where_statement .= " WHERE ";
-    //         $counter = 0;
-
-    //         foreach($where as $column => $value){
-    //             if($counter < count($where) - 1){
-    //                 $where_statement .= " $column <= '$value' AND";}
-    //             else{
-    //                 $where_statement .= " $column <= '$value' ";}
-    //             $counter++;
-    //         }
-    //     }
-    //     return $where_statement;
-    // }
-    // public function maxvalue($table, $columns = [], $where = []){
-    //     $columns = $this->columns($columns);
-    //     $whereClause = $this->wherevalue($where);
-    //     $sql = "SELECT $columns FROM $table $whereClause";
-    //     return $this->pdo->query($sql);
-
-    // }
-
     public function distinctSelect($table, $column){
         $sql = "SELECT DISTINCT ($column) FROM $table "; 
         return $this->pdo->query($sql);       
 
     }
-    
-
     
 
 }
