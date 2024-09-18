@@ -7,14 +7,21 @@ if(!(isset($_SESSION['logged_in'])) && !($_SESSION['logged_in'] == true)){
 }
 
 if(isset($_GET['search-products']) && !empty($_GET['search-products'])){
-    $products = (new CRUD($pdo))->search('product',[],['name'=>$_GET['search-products']],'');
+    $search_products = (new CRUD($pdo))->search('product',[],['name'=>$_GET['search-products']],'');
+    $search_products = $search_products->fetchAll();
+
+    if (count($search_products) > 0) {
+        $products = $search_products;
+    } else {
+        $products = []; // No products found
+    }
 
 }else{
     $products = (new CRUD($pdo))->select('product',[],[],'','');
-
+    $products = $products->fetchAll();
 }
 
-$products = $products->fetchAll();
+
 
 if(isset($_GET['action']) && $_GET['action'] == 'delete'){
     $deleteproduct = (new CRUD($pdo))->delete('product','id',$_GET['id']);
@@ -37,107 +44,18 @@ if(isset($_GET['action']) && ($_GET['action']) == 'edit'){
         $category = $_POST['edit-category'];
         $edit = (new Crud($pdo)) -> update('product', ['name', 'price','size','qty','eraid', 'categoryid'],[$name, $price, $size, $qty, $era, $category], ['id' => $_POST['productid']]);
         if ($edit) {
-            // echo "heyyyyyyyyyyyyyyyyyyyyyyyy";
 
             header('Location:manage-products.php');
         } else {
-            // echo "HIIIIIIIIIIIIIIIIIIIIIII";
-            // echo "<pre>";
-            // print_r($edit);
             $errors[] = 'Failed to update product';
         }
     }
-    
-
 
 }
 
 ?>
 <?php
-//different logic
-// if(isset($_POST['update-btn'])){
-
-//     if((!empty($_POST['edit-name'])) && (!empty($_POST['edit-size'])) && (!empty($_POST['edit-price'])) && (!empty($_POST['edit-qty'])) && (!empty($_POST['edit-era'])) && (!empty($_POST['edit-category']))){
-
-//         $updateproduct = (new CRUD($pdo)) -> update('product',['name','size','price','qty','eraid','categoryid'],[$_POST['edit-name'],$_POST['edit-size'],$_POST['edit-price'],$_POST['edit-qty'],$_POST['edit-era'],$_POST['edit-category']],['id'=>$_POST['productid']]);
-
-//         $images = $_FILES['image'];
-        
-//         if($updateproduct){
-            
-//             $image_uploaded = $images['name'];
-
-//             if(isset($images) && count($image_uploaded)>0){
-//                 foreach($image_uploaded as $key => $image_name){
-    
-//                     $img_tempname = $images['tmp_name'][$key];
-//                     $img_newname = time() . '-'. $image_name;
-    
-//                     if(move_uploaded_file($img_tempname, 'assets/images/products/'.$img_newname)){
-
-//                         $allprodids = $crudObj->select('image',[],['productid'=> $_POST['productid']],'','');
-//                         $allprodids = $allprodids->fetchAll();
-
-                        
-
-//                         if(count($allprodids)>1){
-//                             $parts = explode('-', $img_newname);
-//                             $lastpart = '-' . end($parts);
-//                             foreach($allprodids as $prodid){
-
-//                                 if(!strpos($prodid['src'],$lastpart)){
-//                                     $updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['productid']]);
-//                                     if($updateImage){
-
-//                                     }
-//                                     break;
-                                    
-
-//                                 } else {
-//                                     continue;
-//                                 }
-//                             }
-
-                           
-//                         }else{
-//                             $updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['productid']]);
-//                         }
-
-
-//                         //$updateImage = $crudObj->update('image',['src'],[$img_newname],['productid'=> $_POST['productid']]);
-//                         //$insertImage = (new CRUD($pdo))->insert('image', ['productid', 'src'], [$_POST['id'], $img_newname]);
-//                         if (!$updateImage) {
-//                             $errors[] = "Failed to update image $image_name";
-//                         }
-//                     } else{
-//                         $errors[] = 'Image could not upload';
-//                     }
-//                 }
-//                 //header('Location:manage-products.php');
-//             }
-//             header('Location:manage-products.php');
-//         }else{
-//             $errors[] = 'Product could not update';
-//         }
-        
-//         //header('Location:manage-products.php');
-//         // exit;
-
-
-//     }else {
-//         $errors [] = 'something went wrong';
-//     }
-//     echo '<pre>';
-//     print_r($_POST);
-//     echo '</pre>';
-// }
-
-
-
-
-
-//final code
-    
+   
 if(isset($_POST['update-btn'])){
     $requiredFields = ['edit-name', 'edit-size', 'edit-price', 'edit-qty', 'edit-era', 'edit-category'];
   
@@ -265,22 +183,30 @@ if(isset($_POST['update-btn'])){
             }
         }
         }
-        // if($errors) {
-        //     echo '<pre>';
-        //     print_r($errors);
-        //     echo '</pre>';
-        // } 
+
     }
 ?>
     <section class="manage-products py-5">
         <div class="container">
         <div class="search mb-3 w-100" style="margin-left:920px;">
             <form class="w-50"  method="get" action="<?= $_SERVER['PHP_SELF'];?>">
-                <input class="w-50" type="search" name="search-products" value="<?= isset($_GET['search-products']) && !empty($_GET['search-products']) ? $_GET['search-products'] : '' ?>" placeholder="Search based on product name" >
+                <div class="input-group w-50">
+                    <input class="form-control" type="search" name="search-products" value="<?= isset($_GET['search-products']) && !empty($_GET['search-products']) ? $_GET['search-products'] : '' ?>" placeholder="Search based on product name" >
+                </div>
             </form>
         </div>
+        <?php if (isset($_GET['search-products']) && !empty($_GET['search-products']) && count($products) === 0): ?>
+            <h2 class="text-center mt-5" style="color:darkolivegreen;">No products found with the search criteria!</h2>
+        <?php endif; ?>
+        <?php if($errors): ?>
+            <div class="alert alert-warning">
+                <?php foreach($errors as $error): ?>
+                    <p class="p-0 m-0"><?php echo $error; ?></p>
+                <?php endforeach;?>
+            </div>
+        <?php endif; ?>
         <?php if(count($products) > 0): ?>
-            <h2 class="text-center">My Products (<?= count($products); ?>)</h2>
+            <h2 class="text-center" style="color:darkolivegreen;">Manage Products (<?= count($products); ?>)</h2>
         
         <div class="row mt-4">
             <button type="submit" class="btn btn-outline-success add-product-btn w-25 mx-auto mb-4"  data-bs-toggle="modal"  data-bs-target="#addProductModal" data-residence-id="">
@@ -312,8 +238,14 @@ if(isset($_POST['update-btn'])){
                 </tr>
                 <?php endforeach; ?>
             </table>
-            <?php else: echo '<p>0 Products </p>'; ?>
         </div>
+        <?php else:?>
+            <?php if (!isset($_GET['search-products']) || empty($_GET['search-products'])): ?>
+                <h2 class="text-center mt-5" style="color:darkolivegreen;">You've got (<?= count($products); ?>) Products to Manage</h2>
+                <p class="text-center mt-5" style="color:darkslategrey;">  
+                    <a href="products.php" style="color:#00d974;" class="link rounded text-decoration-none"> Head to the Products </a> section to ensure everything is okay!
+                </p>
+            <?php endif; ?>
         <?php endif; ?>
 
         <!-- Modal Structure -->
@@ -392,7 +324,7 @@ if(isset($_POST['update-btn'])){
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button name="addproduct" type="submit" class="btn btn-primary">Save Product</button>
+                                <button name="addproduct" type="submit" class="btn btn-success">Save Product</button>
                             </div>
                         </form>
                     </div>
@@ -408,18 +340,15 @@ if(isset($_POST['update-btn'])){
             ?>
             
         <!-- <div class="container d-flex justify-content-center"> -->
-            <div class="product-form w-50 p-4 shadow rounded bg-light">
+            <div class="product-form w-50 p-4 shadow rounded mx-auto mt-5" style="background-color:rgba(116, 148, 100, 0.1)">
                 <div class="text-center mb-4">
-                    <h3 class="mb-3 text-secondary">Update Product</h3>
+                    <h3 class="mb-3" style="font-family: Arial, sans-serif; font-weight: bold; color: #7b9b77;">Update Product</h3>
                 </div>
                 
                 <form method="POST" action="<?php $_SERVER['PHP_SELF'] ?>" enctype="multipart/form-data">
                     <div class="mb-3">
                         <input type="hidden" name="productid" class="form-control" id="productid" value="<?= $fillinput['id']; ?>" >
                     </div>
-                    <!-- <div class="mb-3">
-                        <input type="hidden" name="personid" class="form-control" id="personid" value="<?//=$fillinput['personid'];?>" >
-                    </div> -->
                     <div class="mb-3">
                         <label for="edit-name" class="form-label">Name</label>
                         <input type="text" name="edit-name" class="form-control" id="edit-name" value="<?=$fillinput['name'];?>" required>
@@ -475,17 +404,25 @@ if(isset($_POST['update-btn'])){
                                 <?php endforeach; ?>
                         </select>
                     </div>
-                    
-                    
                     <div class="mb-3">
-                        <label for="image" class="form-label">Image</label>
-                        <input type="file" name="image[]" class="form-control" multiple >
-                    </div>
+                            <label for="image" class="form-label">Image</label>
+                            <input type="file" name="image[]" class="form-control" multiple >
+                    <?php
+                        $getproduct_images = (new CRUD($pdo))->select('image',[],['productid'=>$_GET['id']],'','');
+                            if($getproduct_images){
+                                $getproduct_images = $getproduct_images->fetchAll();
+                        
+                                foreach($getproduct_images as $prod_image){
+                            
+                    ?>
+                            <?php if(!empty($prod_image['src'])) {?>
+                            <img class="mx-5 mt-4" style="height:50px;"  src="./assets/images/products/<?= $prod_image['src']; ?>" alt="<?= $prod_image['alt']; ?>"/>
+                            <?php } else { echo "<em>There is no image set here</em>"; } } }?><br><br>
+                        </div>
                     
-                    <button type="submit" name="update-btn" class="btn btn-primary w-100">Update</button>
+                    <button type="submit" name="update-btn" class="btn btn-success w-100">Update</button>
                 </form>
             </div>
-        <!-- </div> -->
         <?php endif;endif; ?>
 
 
@@ -495,8 +432,6 @@ if(isset($_POST['update-btn'])){
 
 <?php else: header('location:index.php');?>
 <?php endif; endif; ?>
-
-
 
 
 
