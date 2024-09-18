@@ -14,7 +14,6 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
     }   
 }
 
-
 ?>
 
 <?php
@@ -23,14 +22,19 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
     if(isset($_POST['sentorder']) && isset($_POST['order_id'])){
         $crudObj = new Crud($pdo);
         $sentstatus = $crudObj->update('orders',['send_status'],['sent'],['id'=>$_POST['order_id']]);
-        // $orders = $crudObj->select('orders', ['id','personid','fullname','address','notes','created_at','total', 'send_status'], [], '', '');
-        // $orders = $orders->fetchAll();
         header("Location: " . $_SERVER['PHP_SELF']."");
     } else {
         if(isset($_GET['search-orders']) && !empty($_GET['search-orders'])){
 
-            $orders = (new Crud($pdo))->search('orders', ['id','personid','fullname','address','notes','created_at','total', 'send_status'], ['fullname'=>$_GET['search-orders']], 0);
-            $orders = $orders->fetchAll();
+            $search_orders = (new Crud($pdo))->search('orders', ['id','personid','fullname','address','notes','created_at','total', 'send_status'], ['fullname'=>$_GET['search-orders']], 0);
+            $search_orders = $search_orders->fetchAll();
+
+            if (count($search_orders) > 0) {
+                $orders = $search_orders;
+            } else {
+                $orders = []; // No orders found
+            }
+
         }else{
             $orders = (new Crud($pdo))->select('orders', ['id','personid','fullname','address','notes','created_at','total', 'send_status'], [], '', '');
             $orders = $orders->fetchAll();
@@ -38,19 +42,20 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
         
     }
     
-
 ?>
-
-
-
 
 <section class="products py-5">
     <div class="container">
-        <div class="search mb-3 w-100" style="margin-left:900px;">
+        <div class="search mb-3 w-100 " style="margin-left:980px;">
             <form class="w-50"  method="get" action="<?= $_SERVER['PHP_SELF'];?>">
-                <input class="w-50" type="search" name="search-orders" value="<?= isset($_GET['search-orders']) && !empty($_GET['search-orders']) ? $_GET['search-orders'] : '' ?>" placeholder="Search based on fullname" >
+                <div class="input-group w-50">
+                    <input class="form-control" type="search" name="search-orders" value="<?= isset($_GET['search-orders']) && !empty($_GET['search-orders']) ? $_GET['search-orders'] : '' ?>" placeholder="Search based on fullname" >
+                </div>
             </form>
         </div>
+        <?php if (isset($_GET['search-orders']) && !empty($_GET['search-orders']) && count($orders) === 0): ?>
+            <h2 class="text-center mt-5" style="color:darkolivegreen;">No orders found with the search criteria!</h2>
+        <?php endif; ?>
         <?php if(count($errors) > 0){ ?>
             <div class="alert alert-warning ">
                 <?php foreach($errors as $error): ?>
@@ -62,7 +67,7 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
         <?php } ?>
 
         <?php if(count($orders) > 0): ?>
-        <h2 class="text-center">My Orders (<?= count($orders) ?>)</h2>
+        <h2 class="text-center" style="color:darkolivegreen;">Manage Orders (<?= count($orders) ?>)</h2>
         <div class="row mt-4">
             <table class="table">
                 <tr>
@@ -137,7 +142,6 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
                             $orderId = $_GET['id'];
                             $order = (new Crud($pdo))->select('orders', [], ['id' => $orderId], '', '')->fetch();
                             if($order && $order['send_status'] == 'pending'){
-                                //if((new Crud($pdo))->delete('order_product', 'orderid', $_GET['id']) && (new Crud($pdo))->delete('orders', 'id', $_GET['id'])){
                     
                                     $orderproduct = (new Crud($pdo))->select('order_product',[],['orderid'=> $orderId],'','orderid');
                                     $orderproduct = $orderproduct->fetchAll();
@@ -149,26 +153,14 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
                                             exit;
                                         }
                                     }
-                                    // $deleteOrderProducts = (new Crud($pdo))->delete('order_product', 'orderid', $orderId);
-                                    // $deleteOrder = (new Crud($pdo))->delete('orders', 'id', $orderId);
-
-                                    // if ($deleteOrderProducts && $deleteOrder) {
-                                    //     header('Location: index.php');
-                                    //     exit;
-                                    // } else {
-                                    //     // Handle delete failure
-                                    //     echo 'Failed to delete order or order products.';
-                                    //     exit;
-                                    // }
                             }
                             $deleteOrderProducts = (new Crud($pdo))->delete('order_product', 'orderid', $orderId);
                             $deleteOrder = (new Crud($pdo))->delete('orders', 'id', $orderId);
 
                             if ($deleteOrderProducts && $deleteOrder) {
-                                header('Location: index.php');
+                                header('Location: manage-orders.php');
                                 exit;
                             } else {
-                                // Handle delete failure
                                 echo 'Failed to delete order or order products.';
                                 exit;
                             }
@@ -178,7 +170,14 @@ if(isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
                     <?php endforeach; ?>
             </table>
         </div>
-        <?php else : echo "<p>Nuk keni porosi me te dhenat e kerkuara!</p>";  endif; ?>
+        <?php else :  ?> 
+            <?php if (!isset($_GET['search-orders']) || empty($_GET['search-orders'])): ?>
+                <h2 class="text-center mt-5" style="color:darkolivegreen;">You've got (<?= count($orders); ?>) Orders to Manage</h2>
+                <p class="text-center mt-5" style="color:darkslategrey;">
+                    <a href="products.php" style="color:#00d974;" class="link rounded text-decoration-none">Head to the products</a> section to ensure everything is up-to-date and ready for new orders!
+                </p>
+            <?php endif; ?>
+        <?php endif; ?>
 
         <?php
 
