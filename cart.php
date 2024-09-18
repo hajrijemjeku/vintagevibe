@@ -6,6 +6,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
     header('Location:cart.php');
     
 } ?>
+<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true){ ?>
 <?php if(isset($_SESSION['cart']) && (!empty($_SESSION['cart']))){?>
 <table class="table">
     <tr>
@@ -52,6 +53,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
         }
         return $total;
     }?>
+
 <?php
  if(isset($_POST['checkout']) && (isset($_SESSION['cart']) && count($_SESSION['cart'])>0)){
     $user_id = $_SESSION['user_id'];
@@ -78,7 +80,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
     }
     unset($_SESSION['cart']);
 
-    header('Location: cart.php');
+    header('Location: my-orders.php');
 }
 
 ?>
@@ -109,15 +111,16 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
                     </div>
                     <button class="btn btn-sm btn-secondary" type="submit" name="checkout">Check Out</button>
                 </form>
-            <?php } else { ?>
-                    <div class="cart text-center"><h2>Shopping Cart</h2><p>Your cart is empty.</p></div>
-            <?php }; ?>
-
-
+            
+                    
             </div>
         </div>
     </div>
 </section>
-
+<?php } else{ ?>
+        <h2 class="text-center mt-5" style="color:darkolivegreen;">Your cart is empty.  
+        <a href="products.php" style="color:#00d974;" class="link rounded text-decoration-none"> Explore our products </a> and save your favorites to your cart!</h2>
+<?php } ?>
+<?php } else { header('Location:signin.php');} ?>
 
 <?php include('includes/footer.php'); ?>
