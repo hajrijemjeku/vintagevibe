@@ -29,7 +29,6 @@ if(isset($_POST['signup-btn']) ){
                     if($registerUser = $crudObj->insert('person',['name','surname','email','password','address','city','country'],[$name,$surname, $email, $password, $address, $city, $country])){
                     
                         header('Location:signin.php?success=1');
-                        // <div class='alert alert-success'><h3>Registered successfully!</h3></div>
                     }else{
                         $errors[] = 'Something went wrong';
                     }
@@ -46,13 +45,11 @@ if(isset($_POST['signup-btn']) ){
     }    
 }
 
-
 ?>
-
 
 <section class="signup my-5">
     <div class="container d-flex justify-content-center">
-        <div class="signup-form w-50 p-4 shadow rounded bg-light">
+        <div class="signup-form w-50 p-4 shadow rounded" style="background-color:rgba(116, 148, 100, 0.1)">
             <div class="text-center mb-4">
                 <h3 class="mb-3 text-secondary">Create an account</h3>
                 <p class="text-secondary">Or, <a href="signin.php" class="link-info text-decoration-none">sign in to your account</a></p>
