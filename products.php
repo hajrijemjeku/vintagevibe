@@ -180,7 +180,7 @@
                     
         ?>
                 <div class="col-lg-3 col-md-3 col-sm-12 mb-3">
-                    <div class="card" style="width: 18rem;">
+                    <div class="card" style="width: 18rem; height:500px;">
                         <input type="hidden" name="product_id" id="product_id" value="<?= $product['id'] ?>">
                         
                         <!-- <a href="<?//=$url?>&details=<?//= $product['name']; ?>"> -->
