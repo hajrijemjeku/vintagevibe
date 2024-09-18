@@ -60,7 +60,6 @@ if(isset($_POST['add-to-cart'])){
 
 }
 
-
 ?>
 
 <style>
@@ -97,7 +96,8 @@ if(isset($_POST['add-to-cart'])){
 </style>
 <section class="product-details py-5">
     <div class="container mt-4">
-        <h2 class="text-center">product_details.php</h2>
+        <h2 class="text-center mb-5" style="color:darkolivegreen;"> Product Details</h2>
+
         <div class="row">
             <!-- Column 1: Multiple rows with images -->
             <div class="col-md-4 mt-5">
@@ -118,7 +118,7 @@ if(isset($_POST['add-to-cart'])){
             <?php if(!empty($images)):
                    foreach ($images as $image): ?>
                     <p>
-                        <img src="./assets/images/products/<?= $image['src']; ?>" alt="<?= $image['alt']; ?>" style="width:auto; height:200px;" class="img-fluid small-image" />
+                        <img src="./assets/images/products/<?= $image['src']; ?>" alt="<?= $image['alt']; ?>" style="width:auto; height:150px;" class="img-fluid small-image" />
                     </p>    
                 <?php endforeach; else: echo "There's no images to show!";endif; ?>
             </div>
@@ -134,9 +134,9 @@ if(isset($_POST['add-to-cart'])){
             <div class="col-md-4">
                 <div class="p-3 border">
                     <h4>Product Info</h4>
-                    <p>Name:<?php echo $productdetails['name']; ?></p>
-                    <p>Price:<?php echo $productdetails['price']; ?> &euro;</p>
-                    <p>Size:<?php echo $productdetails['size']; ?></p>
+                    <p><strong>Name:    </strong>  <?php echo $productdetails['name']; ?></p>
+                    <p><strong>Price:   </strong>  <?php echo $productdetails['price']; ?> &euro;</p>
+                    <p><strong>Size:    </strong>  <?php echo $productdetails['size']; ?></p>
 
                 </div>
                 <div class="p-3 border mt-3">
