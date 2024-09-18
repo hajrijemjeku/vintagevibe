@@ -61,7 +61,9 @@ if (!empty($wishlistItems)) {
    
         <div class="row mt-4">
         <?php if (empty($wishlistProducts)): ?>
-            <p>Nuk keni produkte ne wishlist!</p>
+            <h2 class="text-center" style="color:darkolivegreen;">Your wishlist is empty.
+            <a href="products.php" style="color:#00d974;" class="link rounded text-decoration-none"> Explore our products </a> and save your favorites to your wishlist!</h2>
+
 
         <?php else: foreach ($wishlistProducts as $product): 
                 $crudObj = new Crud($pdo);
