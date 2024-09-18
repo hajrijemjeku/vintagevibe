@@ -7,13 +7,21 @@ $errors = [];
 if(!(isset($_SESSION['logged_in'])) && !($_SESSION['logged_in'] == true)){
     header('Location:signin.php');}
     if(isset($_GET['search-users']) && !empty($_GET['search-users'])){
-        $users = (new CRUD($pdo))->search('person',[],['name'=>$_GET['search-users']],'');
-    }else{
+        $search_users = (new CRUD($pdo))->search('person',[],['name'=>$_GET['search-users']],'');
+        $search_users = $search_users->fetchAll();
+
+        if (count($search_users) > 0) {
+            $users = $search_users;
+        } else {
+            $users = []; // No users found
+        }
+    }
+    else{
         $users = (new CRUD($pdo))->select('person',[],[],'','');
+        $users = $users->fetchAll();
     }
 
-    $users = $users->fetchAll();
-
+    
 if(isset($_GET['action']) && $_GET['action'] == 'delete'){
     $deleteuser = (new CRUD($pdo))->delete('person','id',$_GET['id']);
 
@@ -29,11 +37,9 @@ if(isset($_POST['edit-btn'])){
 
         header('Location:manage-users.php');
 
-
     }else {
         $errors [] = 'Hi! Something went wrong';
     }
-
 }
 
 ?>
@@ -87,11 +93,6 @@ if(isset($_POST['edit-btn'])){
         }else{
             $errors[] = 'Fill both email and password fields!';
         }   
-        // if($errors) {
-        //     echo '<pre>';
-        //     print_r($errors);
-        //     echo '</pre>';
-        // } 
     }
         
 
@@ -100,9 +101,14 @@ if(isset($_POST['edit-btn'])){
         <div class="container">
         <div class="search mb-3 w-100" style="margin-left:920px;">
             <form class="w-50"  method="get" action="<?= $_SERVER['PHP_SELF'];?>">
-                <input class="w-50" type="search" name="search-users" value="<?= isset($_GET['search-users']) && !empty($_GET['search-users']) ? $_GET['search-users'] : '' ?>" placeholder="Search based on user name" >
+                <div class="input-group w-50">
+                    <input class="form-control" type="search" name="search-users" value="<?= isset($_GET['search-users']) && !empty($_GET['search-users']) ? $_GET['search-users'] : '' ?>" placeholder="Search based on user name" >
+                </div>
             </form>
         </div>
+        <?php if (isset($_GET['search-users']) && !empty($_GET['search-users']) && count($users) === 0): ?>
+            <h2 class="text-center mt-5" style="color:darkolivegreen;">No users found with the search criteria!</h2>
+        <?php endif; ?>
 
         <?php if($errors): ?>
             <div class="alert alert-warning">
@@ -113,7 +119,7 @@ if(isset($_POST['edit-btn'])){
         <?php endif; ?>
         
         <?php if(count($users) > 0): ?>
-            <h2 class="text-center">Users (<?= count($users); ?>)</h2>
+            <h2 class="text-center" style="color:darkolivegreen;">Manage User Accounts (<?= count($users) ?>)</h2>
         
         <div class="row mt-4">
             <table class="table">
@@ -146,8 +152,15 @@ if(isset($_POST['edit-btn'])){
                 </tr>
                 <?php }endforeach; ?>
             </table>
-            <?php else: echo '<p>0 Users </p>'; ?>
         </div>
+        <?php else: ?>
+            <?php if (!isset($_GET['search-users']) || empty($_GET['search-users'])): ?>
+                <h2 class="text-center mt-5" style="color:darkolivegreen;">You've got (<?= count($users); ?>) Users Account to Manage</h2>
+                <p class="text-center mt-5" style="color:darkslategrey;"> Head to the  
+                    <a href="signup.php" style="color:#00d974;" class="link rounded text-decoration-none"> SignUp </a> or  
+                    <a href="signin.php" style="color:#00d974;" class="link rounded text-decoration-none">  SignIn  </a> section to ensure everything is okay!
+                </p>
+            <?php endif; ?>
         <?php endif; ?>
 
             <!-- Modal Structure -->
@@ -230,18 +243,15 @@ if(isset($_POST['edit-btn'])){
             ?>
             
         <!-- <div class="container d-flex justify-content-center"> -->
-            <div class="users-form w-50 p-4 shadow rounded bg-light mx-auto mt-5">
+            <div class="users-form w-50 p-4 shadow rounded mx-auto mt-5" style="background-color:rgba(116, 148, 100, 0.1)">
                 <div class="text-center mb-4">
-                    <h3 class="mb-3 text-secondary">Modify users data</h3>
+                    <h3 class="mb-3" style="font-family: Arial, sans-serif; font-weight: bold; color: #7b9b77;">Modify users data</h3>
                 </div>
                 
                 <form method="POST" action="<?php $_SERVER['PHP_SELF'] ?>" enctype="multipart/form-data">
                     <div class="mb-3">
                         <input type="hidden" name="id" class="form-control" id="id" value="<?= $fillinput['id']; ?>" >
                     </div>
-                    <!-- <div class="mb-3">
-                        <input type="hidden" name="userid" class="form-control" id="userid" value="<?//=$_SESSION['user_id'];?>" >
-                    </div> -->
                     <div class="mb-3">
                         <label for="name" class="form-label">Name</label>
                         <input type="text" name="name" class="form-control" id="name" value="<?=$fillinput['name'];?>" required>
@@ -255,10 +265,9 @@ if(isset($_POST['edit-btn'])){
                         <input type="email" name="email" class="form-control" id="email" required value="<?=$fillinput['email'];?>">
                     </div>
                     
-                    <button type="submit" name="edit-btn" class="btn btn-primary w-100">Modify</button>
+                    <button type="submit" name="edit-btn" class="btn btn-success w-100">Modify</button>
                 </form>
             </div>
-        <!-- </div> -->
         <?php endif; ?>
 
 
